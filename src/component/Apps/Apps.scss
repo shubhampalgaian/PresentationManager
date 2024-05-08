@@ -1,0 +1,101 @@
+.Apps_Parent {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    flex-wrap: wrap;
+
+    &.selected {
+      border: 2px solid red;
+    }
+
+    .add-btn {
+        display: flex;
+        align-items: center;
+        height: 50px;
+        background-color: lightgreen;
+        width: 100%;
+    }
+
+    .leftside, .rightside {
+        display: flex;
+        width: 50vw;
+        height: calc(100vh - 50px);
+    }
+
+    .leftside {
+        background-color: lightblue;  
+        width: calc(50vw - 2rem);
+        height: calc(100vh - 50px - 2rem);
+        gap: 1rem;
+        padding: 1rem;  
+        flex-direction: column;
+        overflow: auto;
+
+        .column {
+            display: flex;
+            flex-direction: column;
+            height: fit-content;
+            width: 100%;
+            // background: blue;
+            border: 1px solid black;
+            border-radius: 8px;
+
+            .col-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 1rem;
+                width: 100%;
+
+                input {
+                    width: fit-content;
+                    background-color: transparent;
+                    border: none;
+                    border-bottom: 1px solid black;
+                    &:focus {
+                        border: none;
+                        outline: none;
+                        border-bottom: 1px solid black;
+                    }
+                }
+            }
+
+            .tvs-box {
+                display: flex;
+                gap: 1rem;
+                padding: 1rem;
+                flex-wrap: wrap;
+                overflow: auto;
+
+                .tv {
+                    display: flex;
+                    border: 1px solid black;
+                    height: 100px;
+                    aspect-ratio: 16/9;
+                    justify-content: space-around;
+                    align-items: center;
+                    width: 200px;
+                }
+
+                .addtv-btn {
+                    display: flex;
+                    border: 1px solid black;
+                    height: 100px;
+                    aspect-ratio: 16/9;
+                    justify-content: space-around;
+                    align-items: center;
+                    width: 200px;
+                    font-size: 50px;
+
+                }
+            }
+        }
+    }
+
+    .rightside {
+        justify-content: center;
+        align-items: center;
+        background-color: lightcoral;
+        font-size: 100px;
+    }
+}

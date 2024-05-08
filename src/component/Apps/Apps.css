@@ -1,0 +1,70 @@
+.Apps_Parent {
+    /* width: 97%; */
+    height: 100%;
+    position: relative;
+    padding: 15px 5px 5px 5px;
+  }
+  
+  .Apps_Parent .topheader {
+    width: 100%;
+    height: 6%;
+    /* position: relative; */
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 15px;
+    justify-content: space-between;
+    /* transform: rotate(180deg); */
+  }
+  
+  .Apps_Plus_Btn,.Apps_RightArrow_Btn {
+    width: 6.444%;
+    /* position: absolute; */
+    left: 2.444%;
+  }
+  
+  .Apps_Header_Content {
+    position: absolute;
+    font-size: 30px;
+    color: rgb(74,90,112);
+  }
+  
+  .Apps_Screens_Header {
+    width: 99%;
+    height: 6.25%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 4%;
+    padding-right: 7%;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    border: 1px solid black;
+    background-color: rgb(243,242,248);
+    border-radius: 20px;
+  }
+  
+  .ArrowDown_btn {
+    transition: all 0.5s ease;
+    width: 15px;
+  }
+  
+ 
+  .Dropdown-1, .Dropdown-2,.Dropdown-3,.Dropdown-4,.Dropdown-5{
+    width: 98%;
+    height: 70%;
+    overflow: hidden;
+    transition: all 0.5s ease;
+    padding: 0% 1%;
+    background-color: rgb(244, 246, 255);
+    border-radius: 20px;
+    margin-bottom: 10px;
+  }
+  
+  
+  .Apps_Screens_Header_Content {
+    font-size: clamp(0.28375rem, -0.0003rem + 4.5455vw, 28.40875rem);
+    font-weight: 400;
+    line-height: 24px;
+    color: #2c2c2c;
+  }
+  

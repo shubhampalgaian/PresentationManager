@@ -1,0 +1,104 @@
+#root {
+  width: 100vw;
+  height: 98vh;
+}
+.main-container {
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  /* border: 1px solid black; */
+  margin: 2%;
+}
+.box {
+  width: 20%;
+  /* height: 50%; */
+  height: 25%;
+  border: 1px solid black;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.left {
+  width: 100%;
+  height: 50%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.right {
+  width: 50%;
+  height: 95%;
+  position: relative;
+}
+
+.topPop {
+  position: absolute;
+  height: 50%;
+  width: 100%;
+  right: 0;
+  top: 0;
+  background-color: aquamarine;
+  border: 1px solid black;
+  z-index: 5;
+}
+.bottomPop {
+  position: absolute;
+  height: 50%;
+  width: 100%;
+  right: 0;
+  bottom: 0;
+  background-color: aquamarine;
+  z-index: 5;
+  border: 1px solid black;
+}
+ul {
+  height: 100%;
+}
+li {
+  height: 7%;
+  font-size: 1rem;
+}
+footer {
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  /* height: 22%; */
+  justify-content: space-around;
+  align-items: center;
+}
+#stopCastBtn {
+  background-color: rgb(251, 251, 255);
+  width: 50%;
+  height: 100px;
+  font-size: large;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+#castButton {
+  background-color: rgb(58, 58, 226);
+  width: 50%;
+  height: 100px;
+  font-size: large;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+iframe::-webkit-scrollbar {
+  display: none;
+}
+#appconfigBtn{
+  background-color: rgb(154, 216, 96);
+  width: 50%;
+  height: 100px;
+  font-size: large;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
