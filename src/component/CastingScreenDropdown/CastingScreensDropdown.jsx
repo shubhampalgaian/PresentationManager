@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import "./castingscreendropdown.css";
+import "./castingscreendropdown.scss";
 
 const CastingScreensDropdown = ({ selectedTV, tvNumber, columns, selectedCol }) => {
   const location = useLocation();
-  const [selectedUrls, setSelectedUrls] = useState([]);const websiteUrls = [
+  const [selectedUrls, setSelectedUrls] = useState([]);
+  const [newUrl, setNewUrl] = useState(""); // State to manage the new URL input
+  const [websiteUrls, setWebsiteUrls] = useState([
     "https://cerebro.aidtaas.com/",
     "https://cerebro.aidtaas.com/BoardSummary/303/AM",
     "https://cerebro.aidtaas.com/BoardSummary/280/BU",
     "https://cerebro.aidtaas.com/BoardSummary/399/MAW%20board",
     "https://cerebro.aidtaas.com/BoardSummary/372/MORR",
     "https://cerebro.aidtaas.com/BoardSummary/292/PIR",
-  ];
+  ]);
 
   useEffect(() => {
     // When a new TV is selected, update the selected URLs if they exist for that TV
@@ -57,21 +60,41 @@ const CastingScreensDropdown = ({ selectedTV, tvNumber, columns, selectedCol }) 
     }
   }, [selectedUrls, tvNumber, location.pathname]);
 
+  // Function to handle adding a new URL
+  const handleAddUrl = (e) => {
+    // debugger
+    if (e.key === "Enter") {
+      setWebsiteUrls((prevurls) => [...prevurls, newUrl]);
+      setNewUrl(""); // Clear input field after adding URL
+    }
+  };
+
   return (
-    <div className="castingscreen-dropdown">
-      {websiteUrls.map((url) => (
-        <li key={url}>
-          <input
-            type="checkbox"
-            className="urlcheckbox"
-            id={url}
-            checked={selectedUrls.includes(url)}
-            onChange={() => handleCheckboxChange(url)}
-          />
-          <label htmlFor={url}>{url}</label>
-        </li>
-      ))}
-    </div>
+    <>
+      <div className="url-input">
+        <input
+          type="text"
+          placeholder="Enter URL and press Enter"
+          value={newUrl}
+          onChange={(e) => setNewUrl(e.target.value)}
+          onKeyPress={handleAddUrl}
+        />
+      </div>
+      <div className="castingscreen-dropdown">
+        {websiteUrls.map((url) => (
+          <li key={url}>
+            <input
+              type="checkbox"
+              className="urlcheckbox"
+              id={url}
+              checked={selectedUrls.includes(url)}
+              onChange={() => handleCheckboxChange(url)}
+            />
+            <label htmlFor={url}>{url}</label>
+          </li>
+        ))}
+      </div>
+    </>
   );
 };
 
