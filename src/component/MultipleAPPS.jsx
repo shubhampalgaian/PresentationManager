@@ -9,53 +9,10 @@ function MultipleAPPS() {
   const location = useLocation();
   const column = location.state;
   const { id, name, tvs } = column.column;
+  let transformedData
   console.log("column in multiple app: ", id, name, tvs);
   
-  const [count, setCount] = useState({
-    tv1: 0,
-    tv2: 0,
-    tv3: 0,
-    tv4: 0,
-    tv5: 0,
-  });
-  const [tvUrls, setTvUrls] = useState({
-    tv1: JSON.parse(localStorage.getItem("tv1")) || [],
-    tv2: JSON.parse(localStorage.getItem("tv2")) || [],
-    tv3: JSON.parse(localStorage.getItem("tv3")) || [],
-    tv4: JSON.parse(localStorage.getItem("tv4")) || [],
-    tv5: JSON.parse(localStorage.getItem("tv5")) || [],
-  });
-
-  function CEORoomcastcall(count) {
-    console.log("inside CEORoomcastcall------------------------");
-
-    const requestOptions = {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify([
-        {
-          device_ip: "192.168.0.167",
-          device_name: "1",
-          url: tvUrls.tv1[count.tv1],
-          number: 1,
-        }
-      ]),
-    };
-
-    fetch(
-      "http://localhost:5000/receive-data",
-      requestOptions
-    )
-      .then((response) => response.json())
-      .then((data) => console.log(data, "data------------cast success"))
-      .catch((error) => console.error("Error:", error));
-  }
-
-  // Inside useEffect
-  useEffect(() => {
+  const handleCast = () => {
     const interval = setInterval(() => {
       setCount((prev) => {
         const newCount = {
@@ -70,9 +27,94 @@ function MultipleAPPS() {
         return newCount;
       });
     }, 80000);
+  }
 
-    return () => clearInterval(interval);
-  }, [tvUrls]);
+  const [count, setCount] = useState();
+  const [tvUrls, setTvUrls] = useState();
+
+  function transformData(data) {
+    return data.map(item => ({
+      device_ip: item.deviceIp,
+      device_name: item.deviceName,
+      urls: item.urls
+    }));
+  }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      // Initialize count state
+      const initialState = {};
+      for (let i = 1; i <= tvs.length; i++) {
+        initialState[`tv${i}`] = 0;
+      }
+      setCount(initialState);
+  
+      // Initialize tvUrls state
+      const initialStateOfUrls = {};
+      tvs.forEach((tv, index) => {
+        initialStateOfUrls[`tv${index + 1}`] = tv.urls || []; 
+      });
+      setTvUrls(initialStateOfUrls);
+    };
+
+    transformedData = transformData(tvs);
+    console.log(transformedData);
+    fetchData();
+
+
+    
+  }, []);
+
+
+  function countIncreament() {
+    const interval = setInterval(() => {
+      const newCount = {};
+      Object.keys(count).forEach((key, i) => {
+        newCount[key] = count[key] === tvs[i].urls.length - 1 ? 0 : count[key] + 1;
+      });
+
+      console.log(newCount);
+      setCount(newCount)
+      CEORoomcastcall(newCount);
+    }, 80000);
+  }
+  
+
+
+  function CEORoomcastcall(count) {
+    console.log("inside CEORoomcastcall------------------------");
+
+    const payload = Object.keys(count).map((key, i) => ({
+      device_ip: tvs[i].deviceIp,
+      device_name: tvs[i].deviceName,
+      url: tvs[i].urls[count[key]]
+    }));
+    console.log("payload : ", payload);
+    
+
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload),
+    };
+
+    fetch(
+      "http://localhost:5000/receive-data",
+      requestOptions
+    )
+      .then((response) => {
+        console.log("here");
+        return countIncreament()
+        response.json()})
+      .then((data) => {
+        console.log(data, "data------------cast success")}
+    
+    )
+      .catch((error) => console.error("Error:", error));
+  }
 
 
   function navigateToApps() {
@@ -92,7 +134,7 @@ function MultipleAPPS() {
       ))
       }
       </div>
-      <div className="btns"><button>Let's cast it yeay!</button></div>
+      <div className="btns"><button onClick={() => CEORoomcastcall(count)}>Let's cast it yeay!</button></div>
     </div>
   );
 }
