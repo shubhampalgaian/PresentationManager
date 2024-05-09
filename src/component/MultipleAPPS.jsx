@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-
+import { useLocation, useNavigate } from "react-router-dom";
+import "./MultiAPPS.scss";
 import "../component/grid.css";
+import TV from "./TV";
 
 function MultipleAPPS() {
   let navigate = useNavigate();
+  const location = useLocation();
+  const column = location.state;
+  const { id, name, tvs } = column.column;
+  console.log("column in multiple app: ", id, name, tvs);
+  
   const [count, setCount] = useState({
     tv1: 0,
     tv2: 0,
@@ -68,13 +74,6 @@ function MultipleAPPS() {
     return () => clearInterval(interval);
   }, [tvUrls]);
 
-  // function startCasting() {
-  //   console.log("inside startCasting-----");
-  // }
-
-  // function stopCasting() {
-  //   console.log("inside stopCasting-----");
-  // }
 
   function navigateToApps() {
     console.log("inside log------------");
@@ -82,89 +81,18 @@ function MultipleAPPS() {
   }
 
   return (
-    <div className="main-container">
-      <div className="left">
-        <div className="box">
-          <iframe
-            title="one"
-            style={{
-              width: "98%",
-              height: "95%",
-              margin: "1%",
-              overflow: "hidden",
-            }}
-            src={tvUrls.tv1[count.tv1]}
-            scrolling="no"
-          />
+    <div className="main-container-multiple">
+      <div className="tvs">
+      {tvs?.map(tv => (
+        <div
+          className="tv"
+        >
+          <iframe src={tv.urls[0]} frameborder="0"></iframe>
         </div>
-        <div className="box">
-          <iframe
-            title="two"
-            style={{
-              width: "98%",
-              height: "95%",
-              margin: "1%",
-              overflow: "hidden",
-            }}
-            src={tvUrls.tv2[count.tv2]}
-            scrolling="no"
-          />
-        </div>
-        <div className="box">
-          <iframe
-            title="three"
-            style={{
-              width: "98%",
-              height: "95%",
-              margin: "1%",
-              overflow: "hidden",
-            }}
-            src={tvUrls.tv3[count.tv3]}
-            scrolling="no"
-          />
-        </div>
-        <div className="box">
-          <iframe
-            title="four"
-            style={{
-              width: "98%",
-              height: "95%",
-              margin: "1%",
-              overflow: "hidden",
-            }}
-            src={tvUrls.tv4[count.tv4]}
-            scrolling="no"
-          />
-        </div>
-        <div className="box">
-          <iframe
-            title="five"
-            style={{
-              width: "98%",
-              height: "95%",
-              margin: "1%",
-              overflow: "hidden",
-            }}
-            src={tvUrls.tv5[count.tv5]}
-            scrolling="no"
-          />
-        </div>
-        {/* Add iframes for other TVs */}
+      ))
+      }
       </div>
-      <footer>
-        <button id="appconfigBtn" onClick={navigateToApps}>
-          Select Multiple APP
-        </button>
-        {/* <button onClick={stopCasting} id="stopCastBtn">
-          Stop Casting
-        </button>
-        <button onClick={startCasting} id="castButton">
-          Start Casting
-        </button> */}
-        <button onClick={()=>navigate("/presentation")} id="stopCastBtn">
-          Select Presentation
-        </button>
-      </footer>
+      <div className="btns"><button>Let's cast it yeay!</button></div>
     </div>
   );
 }

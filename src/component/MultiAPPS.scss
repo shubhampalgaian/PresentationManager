@@ -1,0 +1,42 @@
+.main-container-multiple {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    flex-wrap: wrap;
+    background-color: bisque;
+
+    .tvs {
+        display: flex;
+        width: 100%;
+        justify-content: center;
+        gap: 0.5rem;
+
+        .tv {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 200px;
+            aspect-ratio: 16/9;
+            background: pink;
+            border: 1px solid;
+            
+            iframe {
+                width: 100%;
+                aspect-ratio: 16/9;
+            }
+        }
+    }
+
+    .btns {
+        display: flex;
+        width: 100%;
+        justify-content: center;
+
+        button {
+            padding: 1rem;
+            font-size: 16px;
+        }
+    }
+}

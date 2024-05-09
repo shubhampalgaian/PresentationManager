@@ -60,6 +60,16 @@
                 }
             }
 
+            .casting-nav {
+                display: flex;
+                justify-content: end;
+                padding: 1rem;
+
+                button {
+                    padding: 0.5rem;
+                }
+            }
+
             .tvs-box {
                 display: flex;
                 gap: 1rem;
@@ -93,8 +103,9 @@
     }
 
     .rightside {
-        justify-content: center;
+        justify-content: start;
         align-items: center;
+        flex-direction: column;
         background-color: lightcoral;
         font-size: 100px;
     }
