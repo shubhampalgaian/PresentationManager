@@ -42,6 +42,7 @@ const Column = ({
                 value={columnName}
                 onChange={handleNameChange}
               />
+              <button onClick={() => onRemove(id)}>remove</button>
             </div>
           </Typography>
         </AccordionSummary>
