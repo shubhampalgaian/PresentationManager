@@ -97,6 +97,7 @@ function MultipleAPPS() {
 
   function stopCasting() {
     clearInterval(intervalId);
+    setIntervalId(null)
     
     const payload = Object.keys(count).map((key, i) => ({
       device_ip: tvs[i].deviceIp,
@@ -131,7 +132,7 @@ function MultipleAPPS() {
         ))}
       </div>
       <div className="btns">
-        <button onClick={countIncrement}>
+        <button onClick={countIncrement} disabled={intervalId ? true : false}>
           Let's cast it yeay!
         </button>
         <button onClick={stopCasting}>

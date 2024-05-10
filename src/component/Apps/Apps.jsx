@@ -3,7 +3,8 @@ import "./Apps.scss";
 import CastingScreensDropdown from "../CastingScreenDropdown/CastingScreensDropdown";
 import { UpdateDevicesModal, DeviceModal } from "./Modal";
 import Column from "../Column.jsx";
-const generateRandomId = require("../randomIdGenerator.js");
+import firebaseService from "../../firebaseService.js"
+import generateRandomId from "../randomIdGenerator.js";
 
 const Apps = () => {
   const [columns, setColumns] = useState([
@@ -18,7 +19,7 @@ const Apps = () => {
     { id: 1, name: "Device 1", ip: "192.168.1.1" },
     { id: 2, name: "Device 2", ip: "192.168.1.2" },
   ]);
-  const [filteredDevices, setFilteredDevices] = useState(devices); // State variable for filtered devices
+  const [filteredDevices, setFilteredDevices] = useState(devices); 
 
   useEffect(() => {
     localStorage.setItem("appData", JSON.stringify(columns));
@@ -26,15 +27,8 @@ const Apps = () => {
   }, [columns]);
 
   useEffect(() => {
-    // Update filtered devices whenever devices change
     setFilteredDevices(devices);
   }, [devices]);
-
-  const handleTVSelect = (tvNumber, columnId) => {
-    setSelectedTV(tvNumber);
-    setSelectedCol(columnId);
-    console.log(`Clicked TV ${tvNumber} in column ${selectedCol}`);
-  };
 
   const addColumn = () => {
     const newId = columns.length + 1;
@@ -47,6 +41,16 @@ const Apps = () => {
       const updatedColumns = [...prevColumns, newColumn];
       return updatedColumns;
     });
+  };
+
+  const saveToFirebase = () => {
+    firebaseService.saveColumnsToFirestore(columns);
+  };
+
+  const handleTVSelect = (tvNumber, columnId) => {
+    setSelectedTV(tvNumber);
+    setSelectedCol(columnId);
+    console.log(`Clicked TV ${tvNumber} in column ${selectedCol}`);
   };
 
   const addTV = (columnIndex) => {
@@ -98,7 +102,7 @@ const Apps = () => {
 
   const handleUpdateDevices = (updatedDevices) => {
     setDevices((prevDevices) => [...prevDevices, ...updatedDevices]);
-    setFilteredDevices((prevDevices) => [...prevDevices, ...updatedDevices]); // Update filtered devices as well
+    setFilteredDevices((prevDevices) => [...prevDevices, ...updatedDevices]); 
     console.log("Updated devices:", updatedDevices);
   };
 
@@ -115,7 +119,8 @@ const Apps = () => {
     <div className="Apps_Parent">
       <div className="add-btn">
         <button onClick={addColumn}>Add Column</button>
-        <button onClick={handleOpenUpdateModal}>Update Devices</button> {/* Button to open Update Devices modal */}
+        <button onClick={handleOpenUpdateModal}>Update Devices</button>
+        <button onClick={saveToFirebase}>Save to Firebase</button>
       </div>
       <div className="leftside columns-container">
         {columns.map((column, index) => (
