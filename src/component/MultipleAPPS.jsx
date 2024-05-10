@@ -12,6 +12,7 @@ function MultipleAPPS() {
   let transformedData
   const [count, setCount] = useState();
   const [initiallyCast, setInitiallyCast] = useState({});
+  const [intervalId, setIntervalId] = useState(null); // Keep track of interval id
 
   function transformData(data) {
     return data.map(item => ({
@@ -21,11 +22,8 @@ function MultipleAPPS() {
     }));
   }
 
-  let interval 
-
   useEffect(() => {
     const fetchData = async () => {
-      
       const initialState = {};
       for (let i = 1; i <= tvs.length; i++) {
         initialState[`tv${i}`] = 0;
@@ -44,22 +42,18 @@ function MultipleAPPS() {
     console.log(transformedData);    
   }, []);
 
-
-  async function countIncreament() {
+  async function countIncrement() {
     await CEORoomcastcall(count);
-
-    interval = setInterval(() => {
+    const id = setInterval(() => {
       const newCount = {};
       Object.keys(count).forEach((key, i) => {
         newCount[key] = count[key] >= tvs[i].urls.length - 1 ? 0 : count[key] + 1;
       });
-
-      console.log(newCount);
-      setCount(newCount)
+      setCount(newCount);
       CEORoomcastcall(newCount);
     }, 80000);
+    setIntervalId(id);
   }
-  
 
   function CEORoomcastcall(count) {
     console.log("inside CEORoomcastcall------------------------");
@@ -101,6 +95,32 @@ function MultipleAPPS() {
       .catch((error) => console.error("Error:", error));
   }
 
+  function stopCasting() {
+    clearInterval(intervalId);
+    // Create payload with isStop true for each TV
+    const payload = Object.keys(count).map((key, i) => ({
+      device_ip: tvs[i].deviceIp,
+      device_name: tvs[i].deviceName,
+      url: tvs[i].urls[count[key]],
+      isStop: true
+    }));
+    // Send the POST request
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload),
+    };
+    fetch("http://localhost:5000/receive-data", requestOptions)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data, "data------------stop cast success");
+      })
+      .catch((error) => console.error("Error:", error));
+  }
+
   return (
     <div className="main-container-multiple">
       <div className="tvs">
@@ -111,10 +131,10 @@ function MultipleAPPS() {
         ))}
       </div>
       <div className="btns">
-        <button onClick={countIncreament}>
+        <button onClick={countIncrement}>
           Let's cast it yeay!
         </button>
-        <button onClick={() => clearInterval(interval)}>
+        <button onClick={stopCasting}>
           Stop It!
         </button>
       </div>
