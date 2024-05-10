@@ -58,7 +58,7 @@ const DeviceModal = ({ open, onClose, devices, onDeviceSelect }) => {
           onChange={(e) => setSearchTerm(e.target.value)}
           InputProps={{
             startAdornment: (
-              <InputAdornment position="start">
+              <InputAdornment position="end">
                 <SearchIcon />
               </InputAdornment>
             ),
