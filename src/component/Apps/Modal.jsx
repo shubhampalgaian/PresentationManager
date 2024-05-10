@@ -8,6 +8,7 @@ import ListItemText from "@mui/material/ListItemText";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
+import Button from "@mui/material/Button";
 
 const useStyles = makeStyles(() => ({
   modal: {
@@ -23,7 +24,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const DeviceModal = ({ open, onClose, devices, onDeviceSelect }) => {
+export const DeviceModal = ({ open, onClose, devices, onDeviceSelect }) => {
   const classes = useStyles();
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredDevices, setFilteredDevices] = useState(devices);
@@ -79,4 +80,41 @@ const DeviceModal = ({ open, onClose, devices, onDeviceSelect }) => {
   );
 };
 
-export default DeviceModal;
+export const UpdateDevicesModal = ({ open, onClose, onUpdateDevices }) => {
+  const classes = useStyles();
+  const [jsonData, setJsonData] = useState("");
+
+  const handleClose = () => {
+    onClose();
+  };
+
+  const handleUpdate = () => {
+    try {
+      const parsedData = JSON.parse(jsonData);
+      onUpdateDevices(parsedData);
+      onClose();
+    } catch (error) {
+      console.error("Error parsing JSON:", error);
+    }
+  };
+
+  return (
+    <Modal open={open} onClose={handleClose} className={classes.modal}>
+      <Paper className={classes.paper}>
+        <h2>Update Devices with JSON</h2>
+        <TextField
+          label="Enter JSON Data"
+          variant="outlined"
+          fullWidth
+          multiline
+          rows={8}
+          value={jsonData}
+          onChange={(e) => setJsonData(e.target.value)}
+        />
+        <Button variant="contained" color="primary" onClick={handleUpdate}>
+          Update Devices
+        </Button>
+      </Paper>
+    </Modal>
+  );
+};

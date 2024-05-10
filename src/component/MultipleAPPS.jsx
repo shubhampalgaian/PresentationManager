@@ -11,6 +11,7 @@ function MultipleAPPS() {
   const { id, name, tvs } = column.column;
   let transformedData
   const [count, setCount] = useState();
+  const [initiallyCast, setInitiallyCast] = useState({});
 
   function transformData(data) {
     return data.map(item => ({
@@ -24,12 +25,18 @@ function MultipleAPPS() {
 
   useEffect(() => {
     const fetchData = async () => {
-      // Initialize count state
+      
       const initialState = {};
       for (let i = 1; i <= tvs.length; i++) {
         initialState[`tv${i}`] = 0;
       }
       setCount(initialState);
+      
+      const initialCastState = {};
+      tvs.forEach((tv, i) => {
+        initialCastState[`tv${i+1}`] = tv.urls.length === 1;
+      });
+      setInitiallyCast(initialCastState);
     };
 
     fetchData();
@@ -39,8 +46,7 @@ function MultipleAPPS() {
 
 
   async function countIncreament() {
-
-    await CEORoomcastcall(count)
+    await CEORoomcastcall(count);
 
     interval = setInterval(() => {
       const newCount = {};
@@ -58,11 +64,24 @@ function MultipleAPPS() {
   function CEORoomcastcall(count) {
     console.log("inside CEORoomcastcall------------------------");
   
-    const payload = Object.keys(count).map((key, i) => ({
-      device_ip: tvs[i].deviceIp,
-      device_name: tvs[i].deviceName,
-      url: tvs[i].urls[count[key]]
-    }));
+    const payload = Object.keys(count).map((key, i) => {
+      if (initiallyCast[key]) {
+        initiallyCast[key] = false;
+        return {
+          device_ip: tvs[i].deviceIp,
+          device_name: tvs[i].deviceName,
+          url: tvs[i].urls[count[key]]
+        };
+      } else if (tvs[i].urls.length > 1) {
+        return {
+          device_ip: tvs[i].deviceIp,
+          device_name: tvs[i].deviceName,
+          url: tvs[i].urls[count[key]]
+        };
+      }
+      return null;
+    }).filter(payload => payload !== null);
+
     console.log("payload : ", payload);
   
     const requestOptions = {
@@ -80,13 +99,6 @@ function MultipleAPPS() {
         console.log(data, "data------------cast success");
       })
       .catch((error) => console.error("Error:", error));
-  }
-  
-
-
-  function navigateToApps() {
-    console.log("inside log------------");
-    navigate("/");
   }
 
   return (
