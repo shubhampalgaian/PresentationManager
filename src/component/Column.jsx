@@ -69,6 +69,7 @@ const Column = ({
                 onSelect={onSelect}
                 selectedTV={selectedTV}
                 columnId={id}
+                urls={tv.urls}
               />
             ))}
             <button

@@ -1,13 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import firebaseService from "../../firebaseService";
 import "./castingscreendropdown.css";
 import "./castingscreendropdown.scss";
 
-const CastingScreensDropdown = ({ selectedTV, tvNumber, columns, selectedCol }) => {
+const CastingScreensDropdown = ({
+  selectedTV,
+  tvNumber,
+  columns,
+  selectedCol,
+}) => {
   const location = useLocation();
   const [selectedUrls, setSelectedUrls] = useState([]);
-  const [newUrl, setNewUrl] = useState(""); // State to manage the new URL input
+  const [newUrl, setNewUrl] = useState("");
   const [websiteUrls, setWebsiteUrls] = useState([
+    "https://around.aidtaas.com/",
+    "https://izak.aidtaas.com",
+    "https://museo.aidtaas.com/",
+    "https://revee.aidtaas.com/",
+    "https://clink.aidtaas.com/",
     "https://cerebro.aidtaas.com/",
     "https://cerebro.aidtaas.com/BoardSummary/303/AM",
     "https://cerebro.aidtaas.com/BoardSummary/280/BU",
@@ -17,14 +28,14 @@ const CastingScreensDropdown = ({ selectedTV, tvNumber, columns, selectedCol }) 
   ]);
 
   useEffect(() => {
-    // When a new TV is selected, update the selected URLs if they exist for that TV
     const columnIdx = columns.findIndex((col) => col.id === selectedCol);
     if (columnIdx !== -1) {
-      const tvIdx = columns[columnIdx].tvs.findIndex((tv) => tv.tvNumber === selectedTV);
+      const tvIdx = columns[columnIdx].tvs.findIndex(
+        (tv) => tv.tvNumber === selectedTV
+      );
       if (tvIdx !== -1) {
         setSelectedUrls(columns[columnIdx].tvs[tvIdx].urls || []);
       } else {
-        // If the selected TV has no URLs, reset the selected URLs
         setSelectedUrls([]);
       }
     }
@@ -37,10 +48,11 @@ const CastingScreensDropdown = ({ selectedTV, tvNumber, columns, selectedCol }) 
         : [...prevSelected, url]
     );
 
-    // Update the URLs array in the TV data
     const columnIdx = columns.findIndex((col) => col.id === selectedCol);
     if (columnIdx !== -1) {
-      const tvIdx = columns[columnIdx].tvs.findIndex((tv) => tv.tvNumber === selectedTV);
+      const tvIdx = columns[columnIdx].tvs.findIndex(
+        (tv) => tv.tvNumber === selectedTV
+      );
       if (tvIdx !== -1) {
         const updatedColumns = [...columns];
         updatedColumns[columnIdx].tvs[tvIdx].urls = selectedUrls.includes(url)
@@ -54,18 +66,16 @@ const CastingScreensDropdown = ({ selectedTV, tvNumber, columns, selectedCol }) 
   };
 
   useEffect(() => {
-    // Update localStorage when selected URLs change
-    if (location.pathname === "/") {
-      localStorage.setItem(`tv${tvNumber}`, JSON.stringify(selectedUrls));
-    }
-  }, [selectedUrls, tvNumber, location.pathname]);
+    // firebaseService.addURLs([newUrl]);
+  }, []);
 
   // Function to handle adding a new URL
   const handleAddUrl = (e) => {
     // debugger
     if (e.key === "Enter") {
+      firebaseService.addURLs([newUrl]);
       setWebsiteUrls((prevurls) => [...prevurls, newUrl]);
-      setNewUrl(""); // Clear input field after adding URL
+      setNewUrl("");
     }
   };
 

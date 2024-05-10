@@ -87,7 +87,7 @@ function MultipleAPPS() {
       body: JSON.stringify(payload),
     };
   
-    fetch("http://localhost:5000/receive-data", requestOptions)
+    fetch("http://localhost:4000/receive-data", requestOptions)
       .then((response) => response.json())
       .then((data) => {
         console.log(data, "data------------cast success");
@@ -114,7 +114,7 @@ function MultipleAPPS() {
       },
       body: JSON.stringify(payload),
     };
-    fetch("http://localhost:5000/receive-data", requestOptions)
+    fetch("http://localhost:4000/receive-data", requestOptions)
       .then((response) => response.json())
       .then((data) => {
         console.log(data, "data------------stop cast success");
@@ -135,9 +135,7 @@ function MultipleAPPS() {
         <button onClick={countIncrement} disabled={intervalId ? true : false}>
           Let's cast it yeay!
         </button>
-        <button onClick={stopCasting}>
-          Stop It!
-        </button>
+        <button onClick={stopCasting}>Stop It!</button>
       </div>
     </div>
   );

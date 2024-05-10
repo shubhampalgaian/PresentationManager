@@ -98,6 +98,33 @@ const firebaseService = {
       return [];
     }
   },
+
+  addURLs: async (urls) => {
+    try {
+      await Promise.all(urls.map(async (url) => {
+        const docRef = await addDoc(collection(db, "urls"), url);
+        console.log("New document added with ID: ", docRef.id);
+      }));
+      console.log("Data saved to Firebase successfully!");
+    } catch (error) {
+      console.error("Error adding/updating document: ", error);
+    }
+  },
+
+  getURLsFromFireStore: async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "urls"));
+      const urls = [];
+      querySnapshot.forEach((doc) => {
+        urls.push(doc.data());
+      });
+      console.log("Columns retrieved from Firebase:", urls);
+      return urls;
+    } catch (error) {
+      console.error("Error getting documents: ", error);
+      return [];
+    }
+  },  
   
 };
 

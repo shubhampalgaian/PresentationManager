@@ -144,6 +144,7 @@ const Apps = () => {
           />
         ))}
       </div>
+      {selectedTV && 
       <div className="rightside url-box">
         {selectedTV ? (
           <CastingScreensDropdown
@@ -154,7 +155,9 @@ const Apps = () => {
         ) : (
           "Please select a TV"
         )}
-      </div>
+
+        <button className="save-btn" onClick={() => setSelectedTV(null)}>Save</button>
+      </div>}
 
       <DeviceModal
         open={isModalOpen}
