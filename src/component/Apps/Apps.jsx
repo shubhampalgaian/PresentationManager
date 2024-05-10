@@ -27,6 +27,12 @@ const Apps = () => {
   }, [columns]);
 
   useEffect(() => {
+    const fetchColumns = async () => {
+      const fetchedColumns = await firebaseService.getColumnsFromFirestore();
+      setColumns(fetchedColumns);
+    };
+    fetchColumns();
+    
     setFilteredDevices(devices);
   }, [devices]);
 

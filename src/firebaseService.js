@@ -35,6 +35,21 @@ const firebaseService = {
     } catch (error) {
       console.error("Error adding/updating document: ", error);
     }
+  },
+
+  getColumnsFromFirestore: async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "columns"));
+      const columns = [];
+      querySnapshot.forEach((doc) => {
+        columns.push(doc.data());
+      });
+      console.log("Columns retrieved from Firebase:", columns);
+      return columns;
+    } catch (error) {
+      console.error("Error getting documents: ", error);
+      return [];
+    }
   }
 };
 
