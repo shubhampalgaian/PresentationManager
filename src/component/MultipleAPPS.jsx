@@ -12,7 +12,7 @@ function MultipleAPPS() {
   let transformedData
   const [count, setCount] = useState();
   const [initiallyCast, setInitiallyCast] = useState({});
-  const [intervalId, setIntervalId] = useState(null); // Keep track of interval id
+  const [intervalId, setIntervalId] = useState(null);
 
   function transformData(data) {
     return data.map(item => ({
@@ -97,14 +97,14 @@ function MultipleAPPS() {
 
   function stopCasting() {
     clearInterval(intervalId);
-    // Create payload with isStop true for each TV
+    
     const payload = Object.keys(count).map((key, i) => ({
       device_ip: tvs[i].deviceIp,
       device_name: tvs[i].deviceName,
       url: tvs[i].urls[count[key]],
       isStop: true
     }));
-    // Send the POST request
+    
     const requestOptions = {
       method: "POST",
       headers: {
