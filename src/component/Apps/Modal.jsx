@@ -30,12 +30,16 @@ export const DeviceModal = ({ open, onClose, devices, onDeviceSelect }) => {
   const [filteredDevices, setFilteredDevices] = useState(devices);
 
   useEffect(() => {
-    const filtered = devices.filter(
-      (device) =>
-        device.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        device.ip.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredDevices(filtered);
+    if(searchTerm.length > 0){
+      const filtered = devices.filter(
+        (device) =>
+          device.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          device.ip.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredDevices(filtered);
+    } else {
+      setFilteredDevices(devices)
+    }
   }, [searchTerm, devices]);
 
   const handleClose = () => {

@@ -1,6 +1,6 @@
 import React from "react";
 
-const TV = ({ tvNumber, name, onSelect, selectedTV, columnId }) => {
+const TV = ({ tvNumber, name, onSelect, selectedTV, columnId, urls }) => {
   const tvStyle = selectedTV === tvNumber ? { border: "2px solid red" } : {};
 
   return (

@@ -87,7 +87,7 @@ function MultipleAPPS() {
       body: JSON.stringify(payload),
     };
   
-    fetch("http://localhost:5000/receive-data", requestOptions)
+    fetch("http://localhost:4000/receive-data", requestOptions)
       .then((response) => response.json())
       .then((data) => {
         console.log(data, "data------------cast success");
@@ -97,6 +97,7 @@ function MultipleAPPS() {
 
   function stopCasting() {
     clearInterval(intervalId);
+    setIntervalId(null)
     
     const payload = Object.keys(count).map((key, i) => ({
       device_ip: tvs[i].deviceIp,
@@ -113,7 +114,7 @@ function MultipleAPPS() {
       },
       body: JSON.stringify(payload),
     };
-    fetch("http://localhost:5000/receive-data", requestOptions)
+    fetch("http://localhost:4000/receive-data", requestOptions)
       .then((response) => response.json())
       .then((data) => {
         console.log(data, "data------------stop cast success");
@@ -131,12 +132,10 @@ function MultipleAPPS() {
         ))}
       </div>
       <div className="btns">
-        <button onClick={countIncrement}>
+        <button onClick={countIncrement} disabled={intervalId ? true : false}>
           Let's cast it yeay!
         </button>
-        <button onClick={stopCasting}>
-          Stop It!
-        </button>
+        <button onClick={stopCasting}>Stop It!</button>
       </div>
     </div>
   );

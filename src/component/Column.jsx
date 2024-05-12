@@ -42,6 +42,7 @@ const Column = ({
                 value={columnName}
                 onChange={handleNameChange}
               />
+              <button onClick={() => onRemove(id)}>remove</button>
             </div>
           </Typography>
         </AccordionSummary>
@@ -68,6 +69,7 @@ const Column = ({
                 onSelect={onSelect}
                 selectedTV={selectedTV}
                 columnId={id}
+                urls={tv.urls}
               />
             ))}
             <button
