@@ -9,90 +9,135 @@ function MultipleAPPS() {
   const location = useLocation();
   const column = location.state;
   const { id, name, tvs } = column.column;
-  console.log("column in multiple app: ", id, name, tvs);
-  
-  const [count, setCount] = useState({
-    tv1: 0,
-    tv2: 0,
-    tv3: 0,
-    tv4: 0,
-    tv5: 0,
-  });
-  const [tvUrls, setTvUrls] = useState({
-    tv1: JSON.parse(localStorage.getItem("tv1")) || [],
-    tv2: JSON.parse(localStorage.getItem("tv2")) || [],
-    tv3: JSON.parse(localStorage.getItem("tv3")) || [],
-    tv4: JSON.parse(localStorage.getItem("tv4")) || [],
-    tv5: JSON.parse(localStorage.getItem("tv5")) || [],
-  });
+  let transformedData
+  const [count, setCount] = useState();
+  const [initiallyCast, setInitiallyCast] = useState({});
+  const [intervalId, setIntervalId] = useState(null);
+
+  function transformData(data) {
+    return data.map(item => ({
+      device_ip: item.deviceIp,
+      device_name: item.deviceName,
+      urls: item.urls
+    }));
+  }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const initialState = {};
+      for (let i = 1; i <= tvs.length; i++) {
+        initialState[`tv${i}`] = 0;
+      }
+      setCount(initialState);
+      
+      const initialCastState = {};
+      tvs.forEach((tv, i) => {
+        initialCastState[`tv${i+1}`] = tv.urls.length === 1;
+      });
+      setInitiallyCast(initialCastState);
+    };
+
+    fetchData();
+    transformedData = transformData(tvs);
+    console.log(transformedData);    
+  }, []);
+
+  async function countIncrement() {
+    await CEORoomcastcall(count);
+    const id = setInterval(() => {
+      const newCount = {};
+      Object.keys(count).forEach((key, i) => {
+        newCount[key] = count[key] >= tvs[i].urls.length - 1 ? 0 : count[key] + 1;
+      });
+      setCount(newCount);
+      CEORoomcastcall(newCount);
+    }, 80000);
+    setIntervalId(id);
+  }
 
   function CEORoomcastcall(count) {
     console.log("inside CEORoomcastcall------------------------");
+  
+    const payload = Object.keys(count).map((key, i) => {
+      if (initiallyCast[key]) {
+        initiallyCast[key] = false;
+        return {
+          device_ip: tvs[i].deviceIp,
+          device_name: tvs[i].deviceName,
+          url: tvs[i].urls[count[key]]
+        };
+      } else if (tvs[i].urls.length > 1) {
+        return {
+          device_ip: tvs[i].deviceIp,
+          device_name: tvs[i].deviceName,
+          url: tvs[i].urls[count[key]]
+        };
+      }
+      return null;
+    }).filter(payload => payload !== null);
 
+    console.log("payload : ", payload);
+  
     const requestOptions = {
       method: "POST",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json"
       },
-      body: JSON.stringify([
-        {
-          device_ip: "192.168.0.167",
-          device_name: "1",
-          url: tvUrls.tv1[count.tv1],
-          number: 1,
-        }
-      ]),
+      body: JSON.stringify(payload),
     };
-
-    fetch(
-      "http://localhost:5000/receive-data",
-      requestOptions
-    )
+  
+    fetch("http://localhost:5000/receive-data", requestOptions)
       .then((response) => response.json())
-      .then((data) => console.log(data, "data------------cast success"))
+      .then((data) => {
+        console.log(data, "data------------cast success");
+      })
       .catch((error) => console.error("Error:", error));
   }
 
-  // Inside useEffect
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCount((prev) => {
-        const newCount = {
-          ...prev,
-          tv1: prev.tv1 === tvUrls.tv1.length - 1 ? 0 : prev.tv1 + 1,
-          tv2: prev.tv2 === tvUrls.tv2.length - 1 ? 0 : prev.tv2 + 1,
-          tv3: prev.tv3 === tvUrls.tv3.length - 1 ? 0 : prev.tv3 + 1,
-          tv4: prev.tv4 === tvUrls.tv4.length - 1 ? 0 : prev.tv4 + 1,
-          tv5: prev.tv5 === tvUrls.tv5.length - 1 ? 0 : prev.tv5 + 1,
-        };
-        CEORoomcastcall(newCount);
-        return newCount;
-      });
-    }, 80000);
-
-    return () => clearInterval(interval);
-  }, [tvUrls]);
-
-
-  function navigateToApps() {
-    console.log("inside log------------");
-    navigate("/");
+  function stopCasting() {
+    clearInterval(intervalId);
+    
+    const payload = Object.keys(count).map((key, i) => ({
+      device_ip: tvs[i].deviceIp,
+      device_name: tvs[i].deviceName,
+      url: tvs[i].urls[count[key]],
+      isStop: true
+    }));
+    
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload),
+    };
+    fetch("http://localhost:5000/receive-data", requestOptions)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data, "data------------stop cast success");
+      })
+      .catch((error) => console.error("Error:", error));
   }
 
   return (
     <div className="main-container-multiple">
       <div className="tvs">
-      {tvs?.map(tv => (
-        <div
-          className="tv"
-        >
-          <iframe src={tv.urls[0]} frameborder="0"></iframe>
-        </div>
-      ))
-      }
+        {tvs?.map((tv) => (
+          <div className="tv">
+            <iframe src={tv.urls[0]} frameborder="0"></iframe>
+          </div>
+        ))}
       </div>
-      <div className="btns"><button>Let's cast it yeay!</button></div>
+      <div className="btns">
+        <button onClick={countIncrement}>
+          Let's cast it yeay!
+        </button>
+        <button onClick={stopCasting}>
+          Stop It!
+        </button>
+      </div>
     </div>
   );
 }
