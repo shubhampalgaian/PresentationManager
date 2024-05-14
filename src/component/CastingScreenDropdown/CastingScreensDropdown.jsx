@@ -13,7 +13,7 @@ const CastingScreensDropdown = ({
 }) => {
   const location = useLocation();
   const [selectedUrls, setSelectedUrls] = useState([]);
-  const [newUrl, setNewUrl] = useState();
+  const [newUrl, setNewUrl] = useState("");
   const [websiteUrls, setWebsiteUrls] = useState([
     "https://around.aidtaas.com/",
     "https://izak.aidtaas.com",
