@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import firebaseService from "../../firebaseService";
-import "./castingscreendropdown.css";
 import "./castingscreendropdown.scss";
+import { Accordion, AccordionSummary, AccordionDetails, Typography } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const CastingScreensDropdown = ({
   selectedTV,
@@ -12,20 +13,45 @@ const CastingScreensDropdown = ({
 }) => {
   const location = useLocation();
   const [selectedUrls, setSelectedUrls] = useState([]);
+  const [newUrlError, setNewUrlError] = useState(false);
+  const [newUrlDisplayNameError, setnewUrlDisplayNameError] = useState(false);
+  const [newCategoryError, setnewCategoryError] = useState(false);
   const [newUrl, setNewUrl] = useState("");
-  const [websiteUrls, setWebsiteUrls] = useState([
-    "https://around.aidtaas.com/",
-    "https://izak.aidtaas.com",
-    "https://museo.aidtaas.com/",
-    "https://revee.aidtaas.com/",
-    "https://clink.aidtaas.com/",
-    "https://cerebro.aidtaas.com/",
-    "https://cerebro.aidtaas.com/BoardSummary/303/AM",
-    "https://cerebro.aidtaas.com/BoardSummary/280/BU",
-    "https://cerebro.aidtaas.com/BoardSummary/399/MAW%20board",
-    "https://cerebro.aidtaas.com/BoardSummary/372/MORR",
-    "https://cerebro.aidtaas.com/BoardSummary/292/PIR",
-  ]);
+  const [newUrlDisplayName, setNewUrlDisplayName] = useState("");
+  const [newCategory, setNewCategory] = useState("");
+  const [websiteUrls, setWebsiteUrls] = useState({});
+
+  const initialUrls = {
+    "b2b": [
+      {"AmplyFund": "https://amplyfund.aidtaas.com/"},
+      {"Museo": "https://museo.aidtaas.com/"},
+      {"Revee": "https://revee.aidtaas.com/"},
+      {"Impressio": "https://impressio.aidtaas.com/"}
+    ],
+    "b2c": [
+      {"HearHere": "https://hearhere.aidtaas.com/"},
+      {"Mo": "https://mo.aidtaas.com/"},
+      {"Izak": "https://izak.aidtaas.com/"},
+      {"Around": "https://around.aidtaas.com/"}
+    ],
+    "b2g": [
+      {"VoteIQ": "http://voteiq.aidtaas.com/"},
+      {"Aegis": "https://aegis.aidtaas.com/"},
+      {"Clink": "https://clink.aidtaas.com/"}
+    ],
+    "xpx": [
+      {"XPX Main": "https://xpx.aidtaas.com/"},
+      {"VoxaV2 Dashboard": "https://xpx.aidtaas.com/voxaV2/dashboard"},
+      {"Adwize Dashboard": "https://xpx.aidtaas.com/adwize/dashboard"},
+      {"Moscribe Dashboard": "https://xpx.aidtaas.com/moscribe/dashboard/Home"}
+    ],
+    "portals": [
+      {"PI Portal": "http://pi.aidtaas.com"},
+      {"Bob Portal": "http://bob.aidtaas.com"},
+      {"Dev Monet": "http://dev-monet.gaiansolutions.com"},
+      {"Holcracy": "http://holcracy.aidtaas.com"}
+    ]
+  };
 
   useEffect(() => {
     const columnIdx = columns.findIndex((col) => col.id === selectedCol);
@@ -40,6 +66,10 @@ const CastingScreensDropdown = ({
       }
     }
   }, [selectedTV, selectedCol, columns]);
+
+  useEffect(() => {
+    setWebsiteUrls(initialUrls);
+  }, []);
 
   const handleCheckboxChange = (url) => {
     setSelectedUrls((prevSelected) =>
@@ -65,17 +95,32 @@ const CastingScreensDropdown = ({
     }
   };
 
-  useEffect(() => {
-    // firebaseService.addURLs([newUrl]);
-  }, []);
+  const handleAddUrl = () => {
+    if (newCategory && newUrl && newUrlDisplayName) {
+      setWebsiteUrls((prevUrls) => {
+        const updatedUrls = { ...prevUrls };
 
-  // Function to handle adding a new URL
-  const handleAddUrl = (e) => {
-    // debugger
-    if (e.key === "Enter") {
-      firebaseService.addURLs([newUrl]);
-      setWebsiteUrls((prevurls) => [...prevurls, newUrl]);
+        if (updatedUrls[newCategory]) {
+          // Category exists, add new URL to it
+          updatedUrls[newCategory].push({ [newUrlDisplayName]: newUrl });
+        } else {
+          // Category doesn't exist, create new category and add URL to it
+          updatedUrls[newCategory] = [{ [newUrlDisplayName]: newUrl }];
+        }
+
+        firebaseService.addURLs([{ [newUrlDisplayName]: newUrl }]);
+        return updatedUrls;
+      });
+
       setNewUrl("");
+      setNewUrlDisplayName("");
+      setNewCategory("");
+    } else if(newUrl.length > 0) {
+      setNewUrlError(true);
+    } else if(newUrlDisplayName.length > 0) {
+      setnewUrlDisplayNameError(true);
+    } else if(newCategory.length > 0) {
+      setnewCategoryError(true);
     }
   };
 
@@ -84,24 +129,54 @@ const CastingScreensDropdown = ({
       <div className="url-input">
         <input
           type="text"
-          placeholder="Enter URL and press Enter"
+          placeholder="Enter Display Name"
+          value={newUrlDisplayName}
+          onChange={(e) => setNewUrlDisplayName(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Enter URL"
           value={newUrl}
           onChange={(e) => setNewUrl(e.target.value)}
-          onKeyPress={handleAddUrl}
         />
+        <input
+          type="text"
+          placeholder="Enter Category"
+          value={newCategory}
+          onChange={(e) => setNewCategory(e.target.value)}
+        />
+        
+        <p>Enter url</p>
+        <p>Enter category</p>
+        <button onClick={handleAddUrl}>Add</button>
       </div>
       <div className="castingscreen-dropdown">
-        {websiteUrls.map((url) => (
-          <li key={url}>
-            <input
-              type="checkbox"
-              className="urlcheckbox"
-              id={url}
-              checked={selectedUrls.includes(url)}
-              onChange={() => handleCheckboxChange(url)}
-            />
-            <label htmlFor={url}>{url}</label>
-          </li>
+        {Object.entries(websiteUrls).map(([category, urls]) => (
+          <Accordion key={category}>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls={`${category}-content`}
+              id={`${category}-header`}
+            >
+              <Typography>{category}</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <ul>
+                {urls.map((item) => (
+                  <li key={Object.keys(item)[0]}>
+                    <input
+                      type="checkbox"
+                      className="urlcheckbox"
+                      id={Object.values(item)[0]}
+                      checked={selectedUrls.includes(Object.values(item)[0])}
+                      onChange={() => handleCheckboxChange(Object.values(item)[0])}
+                    />
+                    <label htmlFor={Object.values(item)[0]}>{Object.keys(item)[0]}</label>
+                  </li>
+                ))}
+              </ul>
+            </AccordionDetails>
+          </Accordion>
         ))}
       </div>
     </>

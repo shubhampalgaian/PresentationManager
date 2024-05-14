@@ -67,6 +67,7 @@
                 display: flex;
                 justify-content: end;
                 padding: 1rem;
+                gap: 1rem;
 
                 button {
                     padding: 0.5rem;
@@ -119,12 +120,15 @@
         flex-direction: column;
         background-color: lightcoral;
         font-size: 100px;
+        padding: 1rem;
+        width: calc(100vw - 2rem);
+        overflow: auto;
 
         .save-btn {
             padding: 1rem;
-            position: absolute;
-            bottom: 1rem;
-            right: 1rem;
+            position: sticky;
+            bottom:10px;
+            left: 90%;
         }
     }
 }
