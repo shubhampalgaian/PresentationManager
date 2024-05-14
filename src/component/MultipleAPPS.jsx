@@ -7,8 +7,9 @@ import TV from "./TV";
 function MultipleAPPS() {
   let navigate = useNavigate();
   const location = useLocation();
-  const column = location.state;
-  const { id, name, tvs } = column.column;
+  const {column, timer} = location.state;
+  console.log("timer : ", timer);
+  const { id, name, tvs } = column;
   let transformedData
   const [count, setCount] = useState({});
   const [initiallyCast, setInitiallyCast] = useState({});
@@ -54,7 +55,7 @@ function MultipleAPPS() {
         CEORoomcastcall(newCount);
         return newCount;
       });
-    }, 60000);
+    }, timer*1000 || 80000);
     setIntervalId(id);
   }
 

@@ -20,7 +20,7 @@ const Column = ({
 }) => {
   const [columnName, setColumnName] = useState(name);
   const navigation = useNavigate();
-
+  const [timer, setTimer] = useState(80000)
   const handleNameChange = (e) => {
     const newName = e.target.value;
     setColumnName(newName);
@@ -49,9 +49,13 @@ const Column = ({
         <AccordionDetails>
           {column && column.tvs && column.tvs.length > 0 && (
             <div className="casting-nav">
+
+              <input type="number" placeholder="Enter time for multicast"
+                onChange={(e) => setTimer(e.target.value)}
+              />
               <button
                 onClick={() =>
-                  navigation("multipleapps", { state: { column } })
+                  navigation("multipleapps", { state: { column, timer } })
                 }
               >
                 Move to casting
