@@ -99,32 +99,41 @@ const firebaseService = {
     }
   },
 
-  addURLs: async (urls) => {
+  saveURLs: async (urls) => {
     try {
-      await Promise.all(urls.map(async (url) => {
-        const docRef = await addDoc(collection(db, "urls"), url);
-        console.log("New document added with ID: ", docRef.id);
-      }));
-      console.log("Data saved to Firebase successfully!");
+      
+      const querySnapshot = await getDocs(collection(db, "urls"));
+      querySnapshot.forEach(async (doc) => {
+        await deleteDoc(doc.ref);
+      });
+      
+      await Promise.all(
+        Object.entries(urls).map(async ([category, urlArray]) => {
+          await addDoc(collection(db, "urls"), { category, urlArray });
+        })
+      );
+
+      console.log("URLs saved to Firebase successfully!");
     } catch (error) {
-      console.error("Error adding/updating document: ", error);
+      console.error("Error saving URLs to Firebase: ", error);
     }
   },
 
   getURLsFromFireStore: async () => {
     try {
       const querySnapshot = await getDocs(collection(db, "urls"));
-      const urls = [];
+      const urls = {};
       querySnapshot.forEach((doc) => {
-        urls.push(doc.data());
+        const data = doc.data();
+        urls[data.category] = data.urlArray;
       });
-      console.log("Columns retrieved from Firebase:", urls);
+      console.log("URLs retrieved from Firebase:", urls);
       return urls;
     } catch (error) {
-      console.error("Error getting documents: ", error);
-      return [];
+      console.error("Error getting URLs from Firebase: ", error);
+      return {};
     }
-  },  
+  },
   
 };
 

@@ -22,38 +22,6 @@ const CastingScreensDropdown = ({
   const [websiteUrls, setWebsiteUrls] = useState({});
   const [selectedCategory, setSelectedCategory] = useState("");
 
-  const initialUrls = {
-    "b2b": [
-      {"AmplyFund": "https://amplyfund.aidtaas.com/"},
-      {"Museo": "https://museo.aidtaas.com/"},
-      {"Revee": "https://revee.aidtaas.com/"},
-      {"Impressio": "https://impressio.aidtaas.com/"}
-    ],
-    "b2c": [
-      {"HearHere": "https://hearhere.aidtaas.com/"},
-      {"Mo": "https://mo.aidtaas.com/"},
-      {"Izak": "https://izak.aidtaas.com/"},
-      {"Around": "https://around.aidtaas.com/"}
-    ],
-    "b2g": [
-      {"VoteIQ": "http://voteiq.aidtaas.com/"},
-      {"Aegis": "https://aegis.aidtaas.com/"},
-      {"Clink": "https://clink.aidtaas.com/"}
-    ],
-    "xpx": [
-      {"XPX Main": "https://xpx.aidtaas.com/"},
-      {"VoxaV2 Dashboard": "https://xpx.aidtaas.com/voxaV2/dashboard"},
-      {"Adwize Dashboard": "https://xpx.aidtaas.com/adwize/dashboard"},
-      {"Moscribe Dashboard": "https://xpx.aidtaas.com/moscribe/dashboard/Home"}
-    ],
-    "portals": [
-      {"PI Portal": "http://pi.aidtaas.com"},
-      {"Bob Portal": "http://bob.aidtaas.com"},
-      {"Dev Monet": "http://dev-monet.gaiansolutions.com"},
-      {"Holcracy": "http://holcracy.aidtaas.com"}
-    ]
-  };
-
   useEffect(() => {
     const columnIdx = columns.findIndex((col) => col.id === selectedCol);
     if (columnIdx !== -1) {
@@ -69,7 +37,11 @@ const CastingScreensDropdown = ({
   }, [selectedTV, selectedCol, columns]);
 
   useEffect(() => {
-    setWebsiteUrls(initialUrls);
+    const fetchUrls = async () => {
+      const urls = await firebaseService.getURLsFromFireStore();
+      setWebsiteUrls(urls);
+    };
+    fetchUrls();
   }, []);
 
   const handleCheckboxChange = (url) => {
@@ -94,7 +66,7 @@ const CastingScreensDropdown = ({
     }
   };
 
-  const handleAddUrl = () => {
+  const handleAddUrl = async () => {
     let hasError = false;
     if (!selectedCategory && !newCategory) {
       setNewCategoryError(true);
@@ -109,7 +81,7 @@ const CastingScreensDropdown = ({
       hasError = true;
     }
 
-    if (!hasError) {      
+    if (!hasError) {
       const categoryToUse = newCategory || selectedCategory;
       const updatedUrls = { ...websiteUrls };
 
@@ -123,6 +95,8 @@ const CastingScreensDropdown = ({
 
       console.log("website URL : ", updatedUrls);
       setWebsiteUrls(updatedUrls);
+
+      await firebaseService.saveURLs(updatedUrls);
 
       setNewUrl("");
       setNewUrlDisplayName("");
