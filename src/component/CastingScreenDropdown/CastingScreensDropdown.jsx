@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import firebaseService from "../../firebaseService";
 import "./castingscreendropdown.scss";
-import { Accordion, AccordionSummary, AccordionDetails, Typography } from '@mui/material';
+import { Accordion, AccordionSummary, AccordionDetails, Typography, MenuItem, Select, TextField, Button } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const CastingScreensDropdown = ({
@@ -20,6 +20,7 @@ const CastingScreensDropdown = ({
   const [newUrlDisplayName, setNewUrlDisplayName] = useState("");
   const [newCategory, setNewCategory] = useState("");
   const [websiteUrls, setWebsiteUrls] = useState({});
+  const [selectedCategory, setSelectedCategory] = useState("");
 
   const initialUrls = {
     "b2b": [
@@ -95,7 +96,7 @@ const CastingScreensDropdown = ({
 
   const handleAddUrl = () => {
     let hasError = false;
-    if (!newCategory) {
+    if (!selectedCategory && !newCategory) {
       setNewCategoryError(true);
       hasError = true;
     }
@@ -109,14 +110,15 @@ const CastingScreensDropdown = ({
     }
 
     if (!hasError) {      
-      const updatedUrls = websiteUrls;
+      const categoryToUse = newCategory || selectedCategory;
+      const updatedUrls = { ...websiteUrls };
 
-      if (updatedUrls[newCategory]) {
+      if (updatedUrls[categoryToUse]) {
         // Category exists, add new URL to it
-        updatedUrls[newCategory].push({ [newUrlDisplayName]: newUrl });
+        updatedUrls[categoryToUse].push({ [newUrlDisplayName]: newUrl });
       } else {
         // Category doesn't exist, create new category and add URL to it
-        updatedUrls[newCategory] = [{ [newUrlDisplayName]: newUrl }];
+        updatedUrls[categoryToUse] = [{ [newUrlDisplayName]: newUrl }];
       }
 
       console.log("website URL : ", updatedUrls);
@@ -125,6 +127,7 @@ const CastingScreensDropdown = ({
       setNewUrl("");
       setNewUrlDisplayName("");
       setNewCategory("");
+      setSelectedCategory("");
       setNewUrlError(false);
       setNewUrlDisplayNameError(false);
       setNewCategoryError(false);
@@ -134,10 +137,30 @@ const CastingScreensDropdown = ({
   return (
     <>
       <div className="url-input">
-        <div>
-          <input
+        <div className="url-input-child">
+          <Select
+            value={selectedCategory}
+            onChange={(e) => {
+              setSelectedCategory(e.target.value);
+              if (newCategoryError && e.target.value) {
+                setNewCategoryError(false);
+              }
+            }}
+            displayEmpty
+          >
+            <MenuItem value="" disabled>
+              Select Category
+            </MenuItem>
+            {Object.keys(websiteUrls).map((category) => (
+              <MenuItem key={category} value={category}>
+                {category}
+              </MenuItem>
+            ))}
+          </Select>
+          <Typography>OR</Typography>
+          <TextField
             type="text"
-            placeholder="Enter Category"
+            placeholder="Enter New Category"
             value={newCategory}
             onChange={(e) => {
               setNewCategory(e.target.value);
@@ -145,11 +168,12 @@ const CastingScreensDropdown = ({
                 setNewCategoryError(false);
               }
             }}
+            error={newCategoryError}
+            helperText={newCategoryError && "Enter Category"}
           />
-          {newCategoryError && <p className="error">Enter Category</p>}
         </div>
-        <div>
-          <input
+        <div className="url-input-child">
+          <TextField
             type="text"
             placeholder="Enter Display Name"
             value={newUrlDisplayName}
@@ -159,11 +183,12 @@ const CastingScreensDropdown = ({
                 setNewUrlDisplayNameError(false);
               }
             }}
+            error={newUrlDisplayNameError}
+            helperText={newUrlDisplayNameError && "Enter Display Name"}
           />
-          {newUrlDisplayNameError && <p className="error">Enter Display Name</p>}
         </div>
-        <div>
-          <input
+        <div className="url-input-child">
+          <TextField
             type="text"
             placeholder="Enter URL"
             value={newUrl}
@@ -173,10 +198,11 @@ const CastingScreensDropdown = ({
                 setNewUrlError(false);
               }
             }}
+            error={newUrlError}
+            helperText={newUrlError && "Enter URL"}
           />
-          {newUrlError && <p className="error">Enter URL</p>}
         </div>
-        <button onClick={handleAddUrl}>Add</button>
+        <Button onClick={handleAddUrl}>Add</Button>
       </div>
       <div className="castingscreen-dropdown">
         {Object.entries(websiteUrls).map(([category, urls]) => (

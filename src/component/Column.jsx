@@ -29,7 +29,7 @@ const Column = ({
 
   return (
     <div className="column">
-      <Accordion defaultExpanded>
+      <Accordion >
         <AccordionSummary
           // expandIcon={<ExpandMoreIcon />}
           aria-controls="panel1-content"
