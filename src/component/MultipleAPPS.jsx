@@ -10,7 +10,7 @@ function MultipleAPPS() {
   const column = location.state;
   const { id, name, tvs } = column.column;
   let transformedData
-  const [count, setCount] = useState();
+  const [count, setCount] = useState({});
   const [initiallyCast, setInitiallyCast] = useState({});
   const [intervalId, setIntervalId] = useState(null);
 
@@ -40,18 +40,21 @@ function MultipleAPPS() {
     fetchData();
     transformedData = transformData(tvs);
     console.log(transformedData);    
-  }, []);
+  }, [tvs]);
 
   async function countIncrement() {
     await CEORoomcastcall(count);
     const id = setInterval(() => {
-      const newCount = {};
-      Object.keys(count).forEach((key, i) => {
-        newCount[key] = count[key] >= tvs[i].urls.length - 1 ? 0 : count[key] + 1;
+      setCount(prevCount => {
+        const newCount = {};
+        Object.keys(prevCount).forEach((key, i) => {
+          newCount[key] = prevCount[key] === tvs[i].urls.length - 1 ? 0 : prevCount[key] + 1;
+        });
+        console.log("inside interval : ", newCount);
+        CEORoomcastcall(newCount);
+        return newCount;
       });
-      setCount(newCount);
-      CEORoomcastcall(newCount);
-    }, 80000);
+    }, 60000);
     setIntervalId(id);
   }
 
@@ -125,9 +128,9 @@ function MultipleAPPS() {
   return (
     <div className="main-container-multiple">
       <div className="tvs">
-        {tvs?.map((tv) => (
-          <div className="tv">
-            <iframe src={tv.urls[0]} frameborder="0"></iframe>
+        {tvs?.map((tv, index) => (
+          <div className="tv" key={index}>
+            <iframe src={tv.urls[0]} frameBorder="0"></iframe>
           </div>
         ))}
       </div>

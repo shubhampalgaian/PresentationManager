@@ -13,20 +13,13 @@ const CastingScreensDropdown = ({
 }) => {
   const location = useLocation();
   const [selectedUrls, setSelectedUrls] = useState([]);
+  const [newUrlError, setNewUrlError] = useState(false);
+  const [newUrlDisplayNameError, setnewUrlDisplayNameError] = useState(false);
+  const [newCategoryError, setnewCategoryError] = useState(false);
   const [newUrl, setNewUrl] = useState("");
-  const [websiteUrls, setWebsiteUrls] = useState([
-    "https://around.aidtaas.com/",
-    "https://izak.aidtaas.com",
-    "https://museo.aidtaas.com/",
-    "https://revee.aidtaas.com/",
-    "https://clink.aidtaas.com/",
-    "https://cerebro.aidtaas.com/",
-    "https://cerebro.aidtaas.com/BoardSummary/303/AM",
-    "https://cerebro.aidtaas.com/BoardSummary/280/BU",
-    "https://cerebro.aidtaas.com/BoardSummary/399/MAW%20board",
-    "https://cerebro.aidtaas.com/BoardSummary/372/MORR",
-    "https://cerebro.aidtaas.com/BoardSummary/292/PIR",
-  ]);
+  const [newUrlDisplayName, setNewUrlDisplayName] = useState("");
+  const [newCategory, setNewCategory] = useState("");
+  const [websiteUrls, setWebsiteUrls] = useState({});
 
   const initialUrls = {
     "b2b": [
@@ -74,6 +67,10 @@ const CastingScreensDropdown = ({
     }
   }, [selectedTV, selectedCol, columns]);
 
+  useEffect(() => {
+    setWebsiteUrls(initialUrls);
+  }, []);
+
   const handleCheckboxChange = (url) => {
     setSelectedUrls((prevSelected) =>
       prevSelected.includes(url)
@@ -98,12 +95,32 @@ const CastingScreensDropdown = ({
     }
   };
 
-  // Function to handle adding a new URL
-  const handleAddUrl = (e) => {
-    if (e.key === "Enter") {
-      firebaseService.addURLs([newUrl]);
-      setWebsiteUrls((prevurls) => [...prevurls, newUrl]);
+  const handleAddUrl = () => {
+    if (newCategory && newUrl && newUrlDisplayName) {
+      setWebsiteUrls((prevUrls) => {
+        const updatedUrls = { ...prevUrls };
+
+        if (updatedUrls[newCategory]) {
+          // Category exists, add new URL to it
+          updatedUrls[newCategory].push({ [newUrlDisplayName]: newUrl });
+        } else {
+          // Category doesn't exist, create new category and add URL to it
+          updatedUrls[newCategory] = [{ [newUrlDisplayName]: newUrl }];
+        }
+
+        firebaseService.addURLs([{ [newUrlDisplayName]: newUrl }]);
+        return updatedUrls;
+      });
+
       setNewUrl("");
+      setNewUrlDisplayName("");
+      setNewCategory("");
+    } else if(newUrl.length > 0) {
+      setNewUrlError(true);
+    } else if(newUrlDisplayName.length > 0) {
+      setnewUrlDisplayNameError(true);
+    } else if(newCategory.length > 0) {
+      setnewCategoryError(true);
     }
   };
 
@@ -112,22 +129,29 @@ const CastingScreensDropdown = ({
       <div className="url-input">
         <input
           type="text"
-          placeholder="Enter Name to shown"
-          value={newUrl}
-          onChange={(e) => setNewUrl(e.target.value)}
-          onKeyPress={handleAddUrl}
+          placeholder="Enter Display Name"
+          value={newUrlDisplayName}
+          onChange={(e) => setNewUrlDisplayName(e.target.value)}
         />
-
-      <input
+        <input
           type="text"
           placeholder="Enter URL"
           value={newUrl}
           onChange={(e) => setNewUrl(e.target.value)}
-          onKeyPress={handleAddUrl}
         />
+        <input
+          type="text"
+          placeholder="Enter Category"
+          value={newCategory}
+          onChange={(e) => setNewCategory(e.target.value)}
+        />
+        
+        <p>Enter url</p>
+        <p>Enter category</p>
+        <button onClick={handleAddUrl}>Add</button>
       </div>
       <div className="castingscreen-dropdown">
-        {Object.entries(initialUrls).map(([category, urls]) => (
+        {Object.entries(websiteUrls).map(([category, urls]) => (
           <Accordion key={category}>
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
