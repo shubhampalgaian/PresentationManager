@@ -10,3 +10,13 @@
         margin-bottom: 1rem;
     }
 }
+
+.castingscreen-dropdown {
+    li {
+        border: 1px solid;
+        margin-bottom: 0.2rem;
+        height: fit-content;
+        display: flex;
+        align-items: center;
+    }
+}

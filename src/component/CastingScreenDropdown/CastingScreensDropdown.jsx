@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import firebaseService from "../../firebaseService";
-import "./castingscreendropdown.css";
 import "./castingscreendropdown.scss";
+import { Accordion, AccordionSummary, AccordionDetails, Typography } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const CastingScreensDropdown = ({
   selectedTV,
@@ -12,7 +13,7 @@ const CastingScreensDropdown = ({
 }) => {
   const location = useLocation();
   const [selectedUrls, setSelectedUrls] = useState([]);
-  const [newUrl, setNewUrl] = useState("");
+  const [newUrl, setNewUrl] = useState();
   const [websiteUrls, setWebsiteUrls] = useState([
     "https://around.aidtaas.com/",
     "https://izak.aidtaas.com",
@@ -26,6 +27,38 @@ const CastingScreensDropdown = ({
     "https://cerebro.aidtaas.com/BoardSummary/372/MORR",
     "https://cerebro.aidtaas.com/BoardSummary/292/PIR",
   ]);
+
+  const initialUrls = {
+    "b2b": [
+      {"AmplyFund": "https://amplyfund.aidtaas.com/"},
+      {"Museo": "https://museo.aidtaas.com/"},
+      {"Revee": "https://revee.aidtaas.com/"},
+      {"Impressio": "https://impressio.aidtaas.com/"}
+    ],
+    "b2c": [
+      {"HearHere": "https://hearhere.aidtaas.com/"},
+      {"Mo": "https://mo.aidtaas.com/"},
+      {"Izak": "https://izak.aidtaas.com/"},
+      {"Around": "https://around.aidtaas.com/"}
+    ],
+    "b2g": [
+      {"VoteIQ": "http://voteiq.aidtaas.com/"},
+      {"Aegis": "https://aegis.aidtaas.com/"},
+      {"Clink": "https://clink.aidtaas.com/"}
+    ],
+    "xpx": [
+      {"XPX Main": "https://xpx.aidtaas.com/"},
+      {"VoxaV2 Dashboard": "https://xpx.aidtaas.com/voxaV2/dashboard"},
+      {"Adwize Dashboard": "https://xpx.aidtaas.com/adwize/dashboard"},
+      {"Moscribe Dashboard": "https://xpx.aidtaas.com/moscribe/dashboard/Home"}
+    ],
+    "portals": [
+      {"PI Portal": "http://pi.aidtaas.com"},
+      {"Bob Portal": "http://bob.aidtaas.com"},
+      {"Dev Monet": "http://dev-monet.gaiansolutions.com"},
+      {"Holcracy": "http://holcracy.aidtaas.com"}
+    ]
+  };
 
   useEffect(() => {
     const columnIdx = columns.findIndex((col) => col.id === selectedCol);
@@ -65,13 +98,8 @@ const CastingScreensDropdown = ({
     }
   };
 
-  useEffect(() => {
-    // firebaseService.addURLs([newUrl]);
-  }, []);
-
   // Function to handle adding a new URL
   const handleAddUrl = (e) => {
-    // debugger
     if (e.key === "Enter") {
       firebaseService.addURLs([newUrl]);
       setWebsiteUrls((prevurls) => [...prevurls, newUrl]);
@@ -84,24 +112,47 @@ const CastingScreensDropdown = ({
       <div className="url-input">
         <input
           type="text"
-          placeholder="Enter URL and press Enter"
+          placeholder="Enter Name to shown"
+          value={newUrl}
+          onChange={(e) => setNewUrl(e.target.value)}
+          onKeyPress={handleAddUrl}
+        />
+
+      <input
+          type="text"
+          placeholder="Enter URL"
           value={newUrl}
           onChange={(e) => setNewUrl(e.target.value)}
           onKeyPress={handleAddUrl}
         />
       </div>
       <div className="castingscreen-dropdown">
-        {websiteUrls.map((url) => (
-          <li key={url}>
-            <input
-              type="checkbox"
-              className="urlcheckbox"
-              id={url}
-              checked={selectedUrls.includes(url)}
-              onChange={() => handleCheckboxChange(url)}
-            />
-            <label htmlFor={url}>{url}</label>
-          </li>
+        {Object.entries(initialUrls).map(([category, urls]) => (
+          <Accordion key={category}>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls={`${category}-content`}
+              id={`${category}-header`}
+            >
+              <Typography>{category}</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <ul>
+                {urls.map((item) => (
+                  <li key={Object.keys(item)[0]}>
+                    <input
+                      type="checkbox"
+                      className="urlcheckbox"
+                      id={Object.values(item)[0]}
+                      checked={selectedUrls.includes(Object.values(item)[0])}
+                      onChange={() => handleCheckboxChange(Object.values(item)[0])}
+                    />
+                    <label htmlFor={Object.values(item)[0]}>{Object.keys(item)[0]}</label>
+                  </li>
+                ))}
+              </ul>
+            </AccordionDetails>
+          </Accordion>
         ))}
       </div>
     </>
