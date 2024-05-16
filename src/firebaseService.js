@@ -1,4 +1,4 @@
-import { initializeApp } from "firebase/app";import { getFirestore, collection, addDoc, doc, setDoc, getDocs, getDoc, query, where, deleteDoc } from "firebase/firestore";
+import { initializeApp } from "firebase/app";import { getFirestore, collection, addDoc, doc, setDoc, getDocs, arrayRemove, query, where, deleteDoc, updateDoc } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAyezd2fLKRHaHQDFgBGtZGA4sLPa8n3jo",
@@ -99,6 +99,66 @@ const firebaseService = {
     }
   },
 
+  removeTV: async (tvNumber, columnId) => {
+    try {
+      // console.log("tvNumber : ", tvNumber, " columnId : ", columnId);
+      const q = query(collection(db, "columns"), where("id", "==", columnId));
+      const querySnapshot = await getDocs(q);
+      
+      if (querySnapshot.size > 0) {
+        // console.log("querySnapshot : ", querySnapshot);
+  
+        querySnapshot.forEach(async (docSnapshot) => {
+          // console.log("doc : ", docSnapshot);
+          const columnData = docSnapshot.data();
+          // console.log("columnData: ", columnData);
+          
+          if (columnData.tvs && columnData.tvs.length > 0) {
+            const tvToRemove = columnData.tvs.find(tv => tv.tvNumber === tvNumber);
+            if (tvToRemove) {
+              const docRef = doc(db, "columns", docSnapshot.id);
+              await updateDoc(docRef, {
+                tvs: arrayRemove(tvToRemove)
+              });
+  
+              console.log(`TV with number ${tvNumber} removed successfully.`);
+              return "deleted";
+            } else {
+              console.log(`TV with number ${tvNumber} not found in column ${columnId}.`);
+            }
+          } else {
+            console.log("No TVs found in the specified column.");
+          }
+        });
+      } else {
+        console.log("Document with ID does not exist: ", columnId);
+      }
+    } catch (error) {
+      console.error("Error deleting TV from document: ", error);
+    }
+  },
+
+  removeCategory: async(category) => {
+    try {
+      console.log("indside ategory delete");
+      const q = query(collection(db, "urls"), where("category", "==", category));
+      const querySnapshot = await getDocs(q);
+      if (querySnapshot.size > 0) {
+        
+        querySnapshot.forEach(async (doc) => {
+          await deleteDoc(doc.ref);
+          console.log("Document deleted with ID: ", category);
+        });
+
+        return "deleted";
+      }  else {
+        console.log("Document with ID does not exist: ", category);
+      }
+    } catch (error) {
+      console.error("Error deleting document: ", error);
+    }
+  },
+
   saveURLs: async (urls) => {
     try {
       
@@ -134,6 +194,35 @@ const firebaseService = {
       return {};
     }
   },
+
+  removeURL: async (url, category) => {
+    try {
+        console.log("url:", url, "category:", category);
+        const q = query(collection(db, "urls"), where("category", "==", category));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.size > 0) {
+            querySnapshot.forEach(async (docSnapshot) => {
+                const categoryData = docSnapshot.data();
+
+                if (categoryData && categoryData.urlArray.length > 0) {
+                    const updatedUrlArray = categoryData.urlArray.filter(urlEntry => {
+                      return !(url in urlEntry);
+                  });
+
+                    const docRef = doc(db, "urls", docSnapshot.id);
+                    await updateDoc(docRef, { urlArray: updatedUrlArray });
+
+                    console.log(`URL ${url} removed from category ${category}`);
+                }
+            });
+        } else {
+            console.log(`No document found for category ${category}`);
+        }
+    } catch (error) {
+        console.log("Error in removing URL from Firebase:", error);
+    }
+  }
   
 };
 

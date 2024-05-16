@@ -17,10 +17,11 @@ const Column = ({
   onRemove,
   onColumnNameChange,
   selectedTV,
+  handleTVremoval
 }) => {
   const [columnName, setColumnName] = useState(name);
   const navigation = useNavigate();
-  const [timer, setTimer] = useState(80000)
+  const [timer, setTimer] = useState(80)
   const handleNameChange = (e) => {
     const newName = e.target.value;
     setColumnName(newName);
@@ -50,7 +51,7 @@ const Column = ({
           {column && column.tvs && column.tvs.length > 0 && (
             <div className="casting-nav">
 
-              <input type="number" placeholder="Enter time for multicast"
+              <input type="number" placeholder="Enter time for multicast" value={timer}
                 onChange={(e) => setTimer(e.target.value)}
               />
               <button
@@ -74,6 +75,7 @@ const Column = ({
                 selectedTV={selectedTV}
                 columnId={id}
                 urls={tv.urls}
+                handleTVremoval={handleTVremoval}
               />
             ))}
             <button

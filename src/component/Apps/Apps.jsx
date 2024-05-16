@@ -7,16 +7,14 @@ import firebaseService from "../../firebaseService.js"
 import generateRandomId from "../randomIdGenerator.js";
 
 const Apps = () => {
-  const [columns, setColumns] = useState([
-    { id: generateRandomId(8), name: "Column 1", tvs: [] },
-  ]);
+  const [columns, setColumns] = useState([]);
   const [selectedTV, setSelectedTV] = useState(null);
   const [selectedCol, setSelectedCol] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalColumnIndex, setModalColumnIndex] = useState(null);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [devices, setDevices] = useState([]);
-  const [filteredDevices, setFilteredDevices] = useState(devices); 
+  const [filteredDevices, setFilteredDevices] = useState(devices);
 
   useEffect(() => {
     localStorage.setItem("appData", JSON.stringify(columns));
@@ -112,14 +110,24 @@ const Apps = () => {
     console.log("Updated devices:", updatedDevices);
   };
 
-  const handleSearchDevice = (searchTerm) => {
-    // const filtered = devices.filter(
-    //   (device) =>
-    //     device.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    //     device.ip.toLowerCase().includes(searchTerm.toLowerCase())
-    // );
-    // setFilteredDevices(filtered);
-  };
+  const handleTVremoval = (tvNumber, columnId) => {
+    // console.log("inside handleTVremoval");
+    // console.log("columns:", columns);
+    // console.log("columnId:", columnId);
+    // console.log("tvNumber:", tvNumber);
+
+    const clone = [...columns];
+
+    const columnIndex = clone.findIndex(column => column.id === columnId);
+
+    if (columnIndex !== -1) {
+        console.log("inside delete : ", clone[columnIndex]);
+        clone[columnIndex].tvs = clone[columnIndex].tvs.filter(tv => tv.tvNumber !== tvNumber);
+        setColumns(clone);
+    } else {
+        console.log(`Column with id ${columnId} does not exist.`);
+    }
+};
 
   return (
     <div className="Apps_Parent">
@@ -141,6 +149,7 @@ const Apps = () => {
             onRemove={() => removeColumn(column.id)}
             onColumnNameChange={updateColumnName}
             selectedTV={selectedTV}
+            handleTVremoval={handleTVremoval}
           />
         ))}
       </div>
