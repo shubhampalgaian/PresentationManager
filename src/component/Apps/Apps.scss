@@ -82,13 +82,15 @@
                 overflow: auto;
 
                 .tv {
-                    display: flex;
+                    // display: flex;
+                    text-align: center;
                     border: 1px solid black;
                     height: 100px;
                     aspect-ratio: 16/9;
                     justify-content: space-around;
                     align-items: center;
                     width: 200px;
+                    padding: 5px;
             
                     iframe {
                         width: 100%;
@@ -118,7 +120,7 @@
         justify-content: start;
         align-items: center;
         flex-direction: column;
-        background-color: lightcoral;
+        background-color: #C0D2E8;
         font-size: 100px;
         padding: 1rem;
         width: calc(100vw - 2rem);
@@ -127,8 +129,13 @@
         .save-btn {
             padding: 1rem;
             position: sticky;
-            bottom:10px;
-            left: 90%;
+            bottom: 10px;
+            left: 85%;
+            background: #336EB5;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            width: 12%;
         }
     }
 }
