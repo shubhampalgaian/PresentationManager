@@ -3,6 +3,7 @@
     height: 100vh;
     width: 100vw;
     flex-wrap: wrap;
+    overflow: hidden;
 
     &.selected {
       border: 2px solid red;
@@ -14,17 +15,19 @@
         height: 50px;
         background-color: lightgreen;
         width: 100%;
+        gap: 1rem;
+        padding: 1rem;
     }
 
     .leftside, .rightside {
         display: flex;
-        width: 50vw;
+        width: 100vw;
         height: calc(100vh - 50px);
     }
 
     .leftside {
         background-color: lightblue;  
-        width: calc(50vw - 2rem);
+        width: calc(100vw - 2rem);
         height: calc(100vh - 50px - 2rem);
         gap: 1rem;
         padding: 1rem;  
@@ -64,6 +67,7 @@
                 display: flex;
                 justify-content: end;
                 padding: 1rem;
+                gap: 1rem;
 
                 button {
                     padding: 0.5rem;
@@ -78,23 +82,30 @@
                 overflow: auto;
 
                 .tv {
-                    display: flex;
+                    // display: flex;
+                    text-align: center;
                     border: 1px solid black;
                     height: 100px;
                     aspect-ratio: 16/9;
                     justify-content: space-around;
                     align-items: center;
                     width: 200px;
+                    padding: 5px;
+            
+                    iframe {
+                        width: 100%;
+                        aspect-ratio: 16/9;
+                    }
                 }
 
                 .addtv-btn {
                     display: flex;
                     border: 1px solid black;
-                    height: 100px;
+                    height: 111px;
                     aspect-ratio: 16/9;
                     justify-content: space-around;
                     align-items: center;
-                    width: 200px;
+                    width: 211px;
                     font-size: 50px;
 
                 }
@@ -103,10 +114,28 @@
     }
 
     .rightside {
+        position: absolute;
+        top: 0;
+        height: 100vh;
         justify-content: start;
         align-items: center;
         flex-direction: column;
-        background-color: lightcoral;
+        background-color: #C0D2E8;
         font-size: 100px;
+        padding: 1rem;
+        width: calc(100vw - 2rem);
+        overflow: auto;
+
+        .save-btn {
+            padding: 1rem;
+            position: sticky;
+            bottom: 10px;
+            left: 85%;
+            background: #336EB5;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            width: 12%;
+        }
     }
 }

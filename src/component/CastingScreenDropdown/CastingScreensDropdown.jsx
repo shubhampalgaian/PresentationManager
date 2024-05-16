@@ -1,97 +1,212 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import "./castingscreendropdown.css";
+import firebaseService from "../../firebaseService";
 import "./castingscreendropdown.scss";
+import { Accordion, AccordionSummary, AccordionDetails, Typography, MenuItem, Select, TextField, Button } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-const CastingScreensDropdown = ({ selectedTV, tvNumber, columns, selectedCol }) => {
+const CastingScreensDropdown = ({
+  selectedTV,
+  tvNumber,
+  columns,
+  selectedCol,
+}) => {
   const location = useLocation();
   const [selectedUrls, setSelectedUrls] = useState([]);
-  const [newUrl, setNewUrl] = useState(""); // State to manage the new URL input
-  const [websiteUrls, setWebsiteUrls] = useState([
-    "https://cerebro.aidtaas.com/",
-    "https://cerebro.aidtaas.com/BoardSummary/303/AM",
-    "https://cerebro.aidtaas.com/BoardSummary/280/BU",
-    "https://cerebro.aidtaas.com/BoardSummary/399/MAW%20board",
-    "https://cerebro.aidtaas.com/BoardSummary/372/MORR",
-    "https://cerebro.aidtaas.com/BoardSummary/292/PIR",
-  ]);
+  const [newUrlError, setNewUrlError] = useState(false);
+  const [newUrlDisplayNameError, setNewUrlDisplayNameError] = useState(false);
+  const [newCategoryError, setNewCategoryError] = useState(false);
+  const [newUrl, setNewUrl] = useState("");
+  const [newUrlDisplayName, setNewUrlDisplayName] = useState("");
+  const [newCategory, setNewCategory] = useState("");
+  const [websiteUrls, setWebsiteUrls] = useState({});
+  const [selectedCategory, setSelectedCategory] = useState("");
 
   useEffect(() => {
-    // When a new TV is selected, update the selected URLs if they exist for that TV
     const columnIdx = columns.findIndex((col) => col.id === selectedCol);
     if (columnIdx !== -1) {
-      const tvIdx = columns[columnIdx].tvs.findIndex((tv) => tv.tvNumber === selectedTV);
+      const tvIdx = columns[columnIdx].tvs.findIndex(
+        (tv) => tv.tvNumber === selectedTV
+      );
       if (tvIdx !== -1) {
         setSelectedUrls(columns[columnIdx].tvs[tvIdx].urls || []);
       } else {
-        // If the selected TV has no URLs, reset the selected URLs
         setSelectedUrls([]);
       }
     }
   }, [selectedTV, selectedCol, columns]);
 
-  const handleCheckboxChange = (url) => {
-    setSelectedUrls((prevSelected) =>
-      prevSelected.includes(url)
-        ? prevSelected.filter((selectedUrl) => selectedUrl !== url)
-        : [...prevSelected, url]
-    );
+  useEffect(() => {
+    const fetchUrls = async () => {
+      const urls = await firebaseService.getURLsFromFireStore();
+      setWebsiteUrls(urls);
+    };
+    fetchUrls();
+  }, []);
 
-    // Update the URLs array in the TV data
+  const handleCheckboxChange = (url) => {
+    const updatedSelectedUrls = selectedUrls.includes(url)
+      ? selectedUrls.filter((selectedUrl) => selectedUrl !== url)
+      : [...selectedUrls, url];
+
+    setSelectedUrls(updatedSelectedUrls);
+
     const columnIdx = columns.findIndex((col) => col.id === selectedCol);
     if (columnIdx !== -1) {
-      const tvIdx = columns[columnIdx].tvs.findIndex((tv) => tv.tvNumber === selectedTV);
+      const tvIdx = columns[columnIdx].tvs.findIndex(
+        (tv) => tv.tvNumber === selectedTV
+      );
       if (tvIdx !== -1) {
         const updatedColumns = [...columns];
-        updatedColumns[columnIdx].tvs[tvIdx].urls = selectedUrls.includes(url)
-          ? selectedUrls.filter((selectedUrl) => selectedUrl !== url)
-          : [...selectedUrls, url];
+        updatedColumns[columnIdx].tvs[tvIdx].urls = updatedSelectedUrls;
         // Update the state of columns with the new TV data
-        columns = updatedColumns;
-        console.log("columns : ", columns);
+        // Pass the updatedColumns to the parent component if needed
+        console.log("columns : ", updatedColumns);
       }
     }
   };
 
-  useEffect(() => {
-    // Update localStorage when selected URLs change
-    if (location.pathname === "/") {
-      localStorage.setItem(`tv${tvNumber}`, JSON.stringify(selectedUrls));
+  const handleAddUrl = async () => {
+    let hasError = false;
+    if (!selectedCategory && !newCategory) {
+      setNewCategoryError(true);
+      hasError = true;
     }
-  }, [selectedUrls, tvNumber, location.pathname]);
+    if (!newUrl) {
+      setNewUrlError(true);
+      hasError = true;
+    }
+    if (!newUrlDisplayName) {
+      setNewUrlDisplayNameError(true);
+      hasError = true;
+    }
 
-  // Function to handle adding a new URL
-  const handleAddUrl = (e) => {
-    // debugger
-    if (e.key === "Enter") {
-      setWebsiteUrls((prevurls) => [...prevurls, newUrl]);
-      setNewUrl(""); // Clear input field after adding URL
+    if (!hasError) {
+      const categoryToUse = newCategory || selectedCategory;
+      const updatedUrls = { ...websiteUrls };
+
+      if (updatedUrls[categoryToUse]) {
+        // Category exists, add new URL to it
+        updatedUrls[categoryToUse].push({ [newUrlDisplayName]: newUrl });
+      } else {
+        // Category doesn't exist, create new category and add URL to it
+        updatedUrls[categoryToUse] = [{ [newUrlDisplayName]: newUrl }];
+      }
+
+      console.log("website URL : ", updatedUrls);
+      setWebsiteUrls(updatedUrls);
+
+      await firebaseService.saveURLs(updatedUrls);
+
+      setNewUrl("");
+      setNewUrlDisplayName("");
+      setNewCategory("");
+      setSelectedCategory("");
+      setNewUrlError(false);
+      setNewUrlDisplayNameError(false);
+      setNewCategoryError(false);
     }
   };
 
   return (
     <>
       <div className="url-input">
-        <input
-          type="text"
-          placeholder="Enter URL and press Enter"
-          value={newUrl}
-          onChange={(e) => setNewUrl(e.target.value)}
-          onKeyPress={handleAddUrl}
-        />
+        <div className="url-input-child">
+          <Select
+            value={selectedCategory}
+            onChange={(e) => {
+              setSelectedCategory(e.target.value);
+              if (newCategoryError && e.target.value) {
+                setNewCategoryError(false);
+              }
+            }}
+            displayEmpty
+          >
+            <MenuItem value="" disabled >
+              Select Category
+            </MenuItem>
+            {Object.keys(websiteUrls).map((category) => (
+              <MenuItem key={category} value={category}>
+                {category}
+              </MenuItem>
+            ))}
+          </Select>
+          <Typography>OR</Typography>
+          <TextField
+            type="text"
+            placeholder="Enter New Category"
+            value={newCategory}
+            onChange={(e) => {
+              setNewCategory(e.target.value);
+              if (newCategoryError && e.target.value) {
+                setNewCategoryError(false);
+              }
+            }}
+            error={newCategoryError}
+            helperText={newCategoryError && "Enter Category"}
+          />
+        </div>
+        <div className="url-input-child">
+          <TextField
+            type="text"
+            placeholder="Enter Display Name"
+            value={newUrlDisplayName}
+            onChange={(e) => {
+              setNewUrlDisplayName(e.target.value);
+              if (newUrlDisplayNameError && e.target.value) {
+                setNewUrlDisplayNameError(false);
+              }
+            }}
+            error={newUrlDisplayNameError}
+            helperText={newUrlDisplayNameError && "Enter Display Name"}
+          />
+        </div>
+        <div className="url-input-child">
+          <TextField
+            type="text"
+            placeholder="Enter URL"
+            value={newUrl}
+            onChange={(e) => {
+              setNewUrl(e.target.value);
+              if (newUrlError && e.target.value) {
+                setNewUrlError(false);
+              }
+            }}
+            error={newUrlError}
+            helperText={newUrlError && "Enter URL"}
+          />
+        </div>
+        <Button onClick={handleAddUrl}>Add</Button>
       </div>
       <div className="castingscreen-dropdown">
-        {websiteUrls.map((url) => (
-          <li key={url}>
-            <input
-              type="checkbox"
-              className="urlcheckbox"
-              id={url}
-              checked={selectedUrls.includes(url)}
-              onChange={() => handleCheckboxChange(url)}
-            />
-            <label htmlFor={url}>{url}</label>
-          </li>
+        {Object.entries(websiteUrls).map(([category, urls]) => (
+          <Accordion key={category}>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls={`${category}-content`}
+              id={`${category}-header`}
+              >
+              <Typography>{category}</Typography>
+              <button className="summaryBtns">Delete Catagory</button>
+            </AccordionSummary>
+            <AccordionDetails>
+              <ul>
+                {urls.map((item) => (
+                  <li key={Object.keys(item)[0]}>
+                    <input
+                      type="checkbox"
+                      className="urlcheckbox"
+                      id={Object.values(item)[0]}
+                      checked={selectedUrls.includes(Object.values(item)[0])}
+                      onChange={() => handleCheckboxChange(Object.values(item)[0])}
+                    />
+                    <label htmlFor={Object.values(item)[0]}>{Object.keys(item)[0]}</label>
+                    <button className="removeUrl">Remove Url</button>
+                  </li>
+                ))}
+              </ul>
+            </AccordionDetails>
+          </Accordion>
         ))}
       </div>
     </>

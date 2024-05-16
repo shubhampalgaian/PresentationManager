@@ -15,20 +15,22 @@ const Apps = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalColumnIndex, setModalColumnIndex] = useState(null);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
-  const [devices, setDevices] = useState([
-    { id: 1, name: "Device 1", ip: "192.168.1.1" },
-    { id: 2, name: "Device 2", ip: "192.168.1.2" },
-  ]);
+  const [devices, setDevices] = useState([]);
   const [filteredDevices, setFilteredDevices] = useState(devices); 
 
   useEffect(() => {
     localStorage.setItem("appData", JSON.stringify(columns));
     console.log("Columns changed:", columns);
-  }, [columns]);
+  }, [devices]);
 
   useEffect(() => {
-    setFilteredDevices(devices);
-  }, [devices]);
+    const fetchColumns = async () => {
+      const fetchedColumns = await firebaseService.getColumnsFromFirestore();const fetchedDevice = await firebaseService.getDeviceFromFireStore()
+      setColumns(fetchedColumns);
+      setDevices(fetchedDevice);
+    };
+    fetchColumns();
+  }, []);
 
   const addColumn = () => {
     const newId = columns.length + 1;
@@ -78,8 +80,11 @@ const Apps = () => {
 
   const removeColumn = (columnId) => {
     const updatedColumns = columns.filter((column) => column.id !== columnId);
+    const data = firebaseService.deleteColumnFromFirestore(columnId);
+    console.log("data : ", data);
     setColumns(updatedColumns);
   };
+  
 
   const updateColumnName = (columnId, newName) => {
     setColumns(
@@ -100,19 +105,20 @@ const Apps = () => {
     setIsUpdateModalOpen(false);
   };
 
-  const handleUpdateDevices = (updatedDevices) => {
-    setDevices((prevDevices) => [...prevDevices, ...updatedDevices]);
-    setFilteredDevices((prevDevices) => [...prevDevices, ...updatedDevices]); 
+  const handleUpdateDevices = async (updatedDevices) => {
+    await setDevices((prevDevices) => [...prevDevices, ...updatedDevices]);
+    // setFilteredDevices((prevDevices) => [...prevDevices, ...updatedDevices]); 
+    firebaseService.addDevices(updatedDevices);
     console.log("Updated devices:", updatedDevices);
   };
 
   const handleSearchDevice = (searchTerm) => {
-    const filtered = devices.filter(
-      (device) =>
-        device.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        device.ip.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredDevices(filtered);
+    // const filtered = devices.filter(
+    //   (device) =>
+    //     device.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    //     device.ip.toLowerCase().includes(searchTerm.toLowerCase())
+    // );
+    // setFilteredDevices(filtered);
   };
 
   return (
@@ -138,6 +144,7 @@ const Apps = () => {
           />
         ))}
       </div>
+      {selectedTV && 
       <div className="rightside url-box">
         {selectedTV ? (
           <CastingScreensDropdown
@@ -148,14 +155,16 @@ const Apps = () => {
         ) : (
           "Please select a TV"
         )}
-      </div>
+
+        <button className="save-btn" onClick={() => setSelectedTV(null)}>Save</button>
+      </div>}
 
       <DeviceModal
         open={isModalOpen}
         onClose={handleCloseModal}
-        devices={filteredDevices}
+        devices={devices}
         onDeviceSelect={handleDeviceSelect}
-        onSearchDevice={handleSearchDevice} 
+        // onSearchDevice={handleSearchDevice} 
       />
 
       <UpdateDevicesModal

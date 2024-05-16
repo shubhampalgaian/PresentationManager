@@ -1,5 +1,4 @@
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { initializeApp } from "firebase/app";import { getFirestore, collection, addDoc, doc, setDoc, getDocs, getDoc, query, where, deleteDoc } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAyezd2fLKRHaHQDFgBGtZGA4sLPa8n3jo",
@@ -15,16 +14,130 @@ const db = getFirestore(app);
 
 const firebaseService = {
   saveColumnsToFirestore: async (columns) => {
-    try {
+    try { 
       await Promise.all(columns.map(async (column) => {
-        const docRef = await addDoc(collection(db, "columns"), column);
-        console.log("Document written with ID: ", docRef.id);
+        // Check if document with same ID exists
+        const q = query(collection(db, "columns"), where("id", "==", column.id));
+        const querySnapshot = await getDocs(q);
+        if (querySnapshot.size > 0) {
+          // If document exists, update it
+          querySnapshot.forEach(async (doc) => {
+            await setDoc(doc.ref, column);
+            console.log("Document updated with ID: ", column.id);
+          });
+        } else {
+          // If document doesn't exist, add new document
+          const docRef = await addDoc(collection(db, "columns"), column);
+          console.log("New document added with ID: ", docRef.id);
+        }
       }));
       console.log("Data saved to Firebase successfully!");
     } catch (error) {
-      console.error("Error adding document: ", error);
+      console.error("Error adding/updating document: ", error);
     }
-  }
+  },
+
+  getColumnsFromFirestore: async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "columns"));
+      const columns = [];
+      querySnapshot.forEach((doc) => {
+        columns.push(doc.data());
+      });
+      console.log("Columns retrieved from Firebase:", columns);
+      return columns;
+    } catch (error) {
+      console.error("Error getting documents: ", error);
+      return [];
+    }
+  },
+  
+  deleteColumnFromFirestore: async (columnId) => {
+    try {
+      const q = query(collection(db, "columns"), where("id", "==", columnId));
+      const querySnapshot = await getDocs(q);
+      if (querySnapshot.size > 0) {
+        
+        querySnapshot.forEach(async (doc) => {
+          await deleteDoc(doc.ref);
+          console.log("Document deleted with ID: ", columnId);
+        });
+
+        return "deleted";
+      }  else {
+        console.log("Document with ID does not exist: ", columnId);
+      }
+    } catch (error) {
+      console.error("Error deleting document: ", error);
+    }
+  },
+
+  addDevices: async (devices) => {
+    try {
+      await Promise.all(devices.map(async (device) => {
+        const docRef = await addDoc(collection(db, "devices"), device);
+        console.log("New document added with ID: ", docRef.id);
+      }));
+      console.log("Data saved to Firebase successfully!");
+    } catch (error) {
+      console.error("Error adding/updating document: ", error);
+    }
+  },
+
+  getDeviceFromFireStore: async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "devices"));
+      const devices = [];
+      querySnapshot.forEach((doc) => {
+        devices.push(doc.data());
+      });
+      console.log("Columns retrieved from Firebase:", devices);
+      return devices;
+    } catch (error) {
+      console.error("Error getting documents: ", error);
+      return [];
+    }
+  },
+
+  saveURLs: async (urls) => {
+    try {
+      
+      const querySnapshot = await getDocs(collection(db, "urls"));
+      querySnapshot.forEach(async (doc) => {
+        await deleteDoc(doc.ref);
+      });
+      
+      await Promise.all(
+        Object.entries(urls).map(async ([category, urlArray]) => {
+          await addDoc(collection(db, "urls"), { category, urlArray });
+        })
+      );
+
+      console.log("URLs saved to Firebase successfully!");
+    } catch (error) {
+      console.error("Error saving URLs to Firebase: ", error);
+    }
+  },
+
+  getURLsFromFireStore: async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "urls"));
+      const urls = {};
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        urls[data.category] = data.urlArray;
+      });
+      console.log("URLs retrieved from Firebase:", urls);
+      return urls;
+    } catch (error) {
+      console.error("Error getting URLs from Firebase: ", error);
+      return {};
+    }
+  },
+  
 };
 
+
 export default firebaseService;
+
+
