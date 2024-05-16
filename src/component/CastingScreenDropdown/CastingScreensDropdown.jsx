@@ -122,7 +122,7 @@ const CastingScreensDropdown = ({
             }}
             displayEmpty
           >
-            <MenuItem value="" disabled>
+            <MenuItem value="" disabled >
               Select Category
             </MenuItem>
             {Object.keys(websiteUrls).map((category) => (
@@ -185,8 +185,9 @@ const CastingScreensDropdown = ({
               expandIcon={<ExpandMoreIcon />}
               aria-controls={`${category}-content`}
               id={`${category}-header`}
-            >
+              >
               <Typography>{category}</Typography>
+              <button className="summaryBtns">Delete Catagory</button>
             </AccordionSummary>
             <AccordionDetails>
               <ul>
@@ -200,6 +201,7 @@ const CastingScreensDropdown = ({
                       onChange={() => handleCheckboxChange(Object.values(item)[0])}
                     />
                     <label htmlFor={Object.values(item)[0]}>{Object.keys(item)[0]}</label>
+                    <button className="removeUrl">Remove Url</button>
                   </li>
                 ))}
               </ul>

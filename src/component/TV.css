@@ -1,0 +1,10 @@
+.removeTv{
+    float: right;
+    height: 15px;
+width: 15px;
+}
+
+.tv>.Apps_Screens_Header_Content{
+    position: relative;
+    top: 25%;
+}

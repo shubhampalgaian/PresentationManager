@@ -17,6 +17,7 @@
         .MuiTextField-root {
           width: 100%;
           margin-bottom: 1rem;
+          margin-top: auto;
         }
     
         input {
@@ -113,4 +114,14 @@
     color: red;
     font-size: 12px;
   }
-  
+  .summaryBtns{
+    margin-left: auto;
+    margin-right: 10px;
+    cursor: pointer;
+
+  }
+  .removeUrl{
+    margin-left: auto;
+    margin-right: 10px;
+    cursor: pointer;
+  }
