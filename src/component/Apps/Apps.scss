@@ -6,7 +6,7 @@
     overflow: hidden;
 
     &.selected {
-      border: 2px solid red;
+        border: 2px solid red;
     }
 
     .add-btn {
@@ -19,18 +19,19 @@
         padding: 1rem;
     }
 
-    .leftside, .rightside {
+    .leftside,
+    .rightside {
         display: flex;
         width: 100vw;
         height: calc(100vh - 50px);
     }
 
     .leftside {
-        background-color: lightblue;  
+        background-color: lightblue;
         width: calc(100vw - 2rem);
         height: calc(100vh - 50px - 2rem);
         gap: 1rem;
-        padding: 1rem;  
+        padding: 1rem;
         flex-direction: column;
         overflow: auto;
 
@@ -43,22 +44,28 @@
             border: 1px solid black;
             border-radius: 8px;
 
-            .col-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 1rem;
+            .MuiPaper-root>#panel1-header>.MuiAccordionSummary-content>p {
                 width: 100%;
 
-                input {
-                    width: fit-content;
-                    background-color: transparent;
-                    border: none;
-                    border-bottom: 1px solid black;
-                    &:focus {
+
+                .col-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 1rem;
+                    width: calc(100% - 2rem);
+
+                    input {
+                        width: fit-content;
+                        background-color: transparent;
                         border: none;
-                        outline: none;
                         border-bottom: 1px solid black;
+
+                        &:focus {
+                            border: none;
+                            outline: none;
+                            border-bottom: 1px solid black;
+                        }
                     }
                 }
             }

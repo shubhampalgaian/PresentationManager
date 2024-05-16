@@ -55,7 +55,7 @@ function MultipleAPPS() {
         CEORoomcastcall(newCount);
         return newCount;
       });
-    }, timer*1000 || 80000);
+    }, timer*1000);
     setIntervalId(id);
   }
 

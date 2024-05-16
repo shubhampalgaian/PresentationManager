@@ -2,6 +2,7 @@
     float: right;
     height: 15px;
 width: 15px;
+cursor: pointer;
 }
 
 .tv>.Apps_Screens_Header_Content{

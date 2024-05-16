@@ -2,8 +2,17 @@ import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import firebaseService from "../../firebaseService";
 import "./castingscreendropdown.scss";
-import { Accordion, AccordionSummary, AccordionDetails, Typography, MenuItem, Select, TextField, Button } from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import {
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Typography,
+  MenuItem,
+  Select,
+  TextField,
+  Button,
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const CastingScreensDropdown = ({
   selectedTV,
@@ -59,8 +68,6 @@ const CastingScreensDropdown = ({
       if (tvIdx !== -1) {
         const updatedColumns = [...columns];
         updatedColumns[columnIdx].tvs[tvIdx].urls = updatedSelectedUrls;
-        // Update the state of columns with the new TV data
-        // Pass the updatedColumns to the parent component if needed
         console.log("columns : ", updatedColumns);
       }
     }
@@ -108,6 +115,27 @@ const CastingScreensDropdown = ({
     }
   };
 
+  const handleRemoveCategory = (category) => {
+    console.log("category : ", category);
+    const clone = { ...websiteUrls };
+    delete clone[category];
+    setWebsiteUrls(clone);
+    firebaseService.removeCategory(category);
+  };
+
+  const handleRemoveURL = async (urlDisplayName, category) => {
+    console.log("Removing URL:", urlDisplayName, "from category:", category);
+    const clone = { ...websiteUrls };
+
+    if (clone[category]) {
+      clone[category] = clone[category].filter(urlEntry => !(urlDisplayName in urlEntry));
+
+      setWebsiteUrls(clone);
+
+      await firebaseService.removeURL(urlDisplayName, category);
+    }
+  };
+
   return (
     <>
       <div className="url-input">
@@ -122,7 +150,7 @@ const CastingScreensDropdown = ({
             }}
             displayEmpty
           >
-            <MenuItem value="" disabled >
+            <MenuItem value="" disabled>
               Select Category
             </MenuItem>
             {Object.keys(websiteUrls).map((category) => (
@@ -185,9 +213,17 @@ const CastingScreensDropdown = ({
               expandIcon={<ExpandMoreIcon />}
               aria-controls={`${category}-content`}
               id={`${category}-header`}
-              >
+            >
               <Typography>{category}</Typography>
-              <button className="summaryBtns">Delete Catagory</button>
+              <button
+                className="summaryBtns"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleRemoveCategory(category);
+                }}
+              >
+                Delete Category
+              </button>
             </AccordionSummary>
             <AccordionDetails>
               <ul>
@@ -198,10 +234,22 @@ const CastingScreensDropdown = ({
                       className="urlcheckbox"
                       id={Object.values(item)[0]}
                       checked={selectedUrls.includes(Object.values(item)[0])}
-                      onChange={() => handleCheckboxChange(Object.values(item)[0])}
+                      onChange={() =>
+                        handleCheckboxChange(Object.values(item)[0])
+                      }
                     />
-                    <label htmlFor={Object.values(item)[0]}>{Object.keys(item)[0]}</label>
-                    <button className="removeUrl">Remove Url</button>
+                    <label htmlFor={Object.values(item)[0]}>
+                      {Object.keys(item)[0]}
+                    </label>
+                    <button
+                      className="removeUrl"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveURL(Object.keys(item)[0], category);
+                      }}
+                    >
+                      Remove Url
+                    </button>
                   </li>
                 ))}
               </ul>
