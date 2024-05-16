@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import Modal from "@mui/material/Modal";
-import { makeStyles } from "@mui/styles";
 import Paper from "@mui/material/Paper";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -9,23 +8,10 @@ import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
 import Button from "@mui/material/Button";
+import "./Modal.scss";
 
-const useStyles = makeStyles(() => ({
-  modal: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  paper: {
-    width: 400,
-    maxHeight: 600,
-    overflowY: "auto",
-    padding: 10,
-  },
-}));
 
 export const DeviceModal = ({ open, onClose, devices, onDeviceSelect }) => {
-  const classes = useStyles();
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredDevices, setFilteredDevices] = useState(devices);
 
@@ -52,8 +38,8 @@ export const DeviceModal = ({ open, onClose, devices, onDeviceSelect }) => {
   };
 
   return (
-    <Modal open={open} onClose={handleClose} className={classes.modal}>
-      <Paper className={classes.paper}>
+    <Modal open={open} onClose={handleClose} className="modal45123">
+      <Paper className="papas54545">
         <h2>Select Device</h2>
         <TextField
           label="Search Device"
@@ -85,7 +71,6 @@ export const DeviceModal = ({ open, onClose, devices, onDeviceSelect }) => {
 };
 
 export const UpdateDevicesModal = ({ open, onClose, onUpdateDevices }) => {
-  const classes = useStyles();
   const [jsonData, setJsonData] = useState("");
 
   const handleClose = () => {
@@ -103,8 +88,8 @@ export const UpdateDevicesModal = ({ open, onClose, onUpdateDevices }) => {
   };
 
   return (
-    <Modal open={open} onClose={handleClose} className={classes.modal}>
-      <Paper className={classes.paper}>
+    <Modal open={open} onClose={handleClose} className="modal45123">
+      <Paper className="papas54545">
         <h2>Update Devices with JSON</h2>
         <TextField
           label="Enter JSON Data"
