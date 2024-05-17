@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation} from "react-router-dom";
 import firebaseService from "../../firebaseService";
 import "./castingscreendropdown.scss";
+import closeBtn from "../Apps/images/cross.png"
 import {
   Accordion,
   AccordionSummary,
@@ -15,6 +16,7 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const CastingScreensDropdown = ({
+  setSelectedTV,
   selectedTV,
   tvNumber,
   columns,
@@ -138,6 +140,10 @@ const CastingScreensDropdown = ({
 
   return (
     <>
+    <div id="closeContainer" onClick={() => setSelectedTV(null)}>
+    <button type="button" id="close_btn">Close</button>
+    <img src={closeBtn} alt="close_btn" id="close_cross"/>
+    </div>
       <div className="url-input">
         <div className="url-input-child">
           <Select
