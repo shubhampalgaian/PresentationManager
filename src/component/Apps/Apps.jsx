@@ -158,6 +158,7 @@ const Apps = () => {
         {selectedTV ? (
           <CastingScreensDropdown
             selectedTV={selectedTV}
+            setSelectedTV={setSelectedTV}
             columns={columns}
             selectedCol={selectedCol}
           />

@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import "./MultiAPPS.scss";
 import "../component/grid.css";
 import TV from "./TV";
+import left_arrow from "../component/Apps/images/left-arrow.svg"
 
 function MultipleAPPS() {
   let navigate = useNavigate();
@@ -128,6 +129,7 @@ function MultipleAPPS() {
 
   return (
     <div className="main-container-multiple">
+        <button  id="back_to_home_btn" onClick={()=>navigate("/")}><span style={{marginRight:"10px",display:"flex"}}><img src={left_arrow} alt="left_arrow"/></span>Back to Home </button>
       <div className="tvs">
         {tvs?.map((tv, index) => (
           <div className="tv" key={index}>
