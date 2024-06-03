@@ -14,6 +14,8 @@ import {
   Button,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { useLoaderContext } from "../../utils/LoaderContext";
+import toast from "react-hot-toast";
 
 const CastingScreensDropdown = ({
   setSelectedTV,
@@ -32,6 +34,7 @@ const CastingScreensDropdown = ({
   const [newCategory, setNewCategory] = useState("");
   const [websiteUrls, setWebsiteUrls] = useState({});
   const [selectedCategory, setSelectedCategory] = useState("");
+  const { toggleLoader, isLoading } = useLoaderContext();
 
   useEffect(() => {
     const columnIdx = columns.findIndex((col) => col.id === selectedCol);
@@ -104,8 +107,10 @@ const CastingScreensDropdown = ({
 
       console.log("website URL : ", updatedUrls);
       setWebsiteUrls(updatedUrls);
-
+      toggleLoader(true);
       await firebaseService.saveURLs(updatedUrls);
+      toggleLoader(false);
+      toast.success("Saved URL");
 
       setNewUrl("");
       setNewUrlDisplayName("");
@@ -117,12 +122,15 @@ const CastingScreensDropdown = ({
     }
   };
 
-  const handleRemoveCategory = (category) => {
+  const handleRemoveCategory = async (category) => {
     console.log("category : ", category);
     const clone = { ...websiteUrls };
     delete clone[category];
     setWebsiteUrls(clone);
-    firebaseService.removeCategory(category);
+    toggleLoader(true)
+    await firebaseService.removeCategory(category);
+    toggleLoader(false);
+    toast.success("Removed category");
   };
 
   const handleRemoveURL = async (urlDisplayName, category) => {
@@ -134,7 +142,10 @@ const CastingScreensDropdown = ({
 
       setWebsiteUrls(clone);
 
+      toggleLoader(true);
       await firebaseService.removeURL(urlDisplayName, category);
+      toggleLoader(false);
+      toast.success("Removed URL");
     }
   };
 
