@@ -5,6 +5,8 @@ import { UpdateDevicesModal, DeviceModal } from "./Modal";
 import Column from "../Column.jsx";
 import firebaseService from "../../firebaseService.js"
 import generateRandomId from "../randomIdGenerator.js";
+import toast from "react-hot-toast";
+import { useLoaderContext } from "../../utils/LoaderContext.js";
 
 const Apps = () => {
   const [columns, setColumns] = useState([]);
@@ -15,6 +17,7 @@ const Apps = () => {
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [devices, setDevices] = useState([]);
   const [filteredDevices, setFilteredDevices] = useState(devices);
+  const { toggleLoader } = useLoaderContext();
 
   useEffect(() => {
     localStorage.setItem("appData", JSON.stringify(columns));
@@ -23,9 +26,11 @@ const Apps = () => {
 
   useEffect(() => {
     const fetchColumns = async () => {
+      toggleLoader(true);
       const fetchedColumns = await firebaseService.getColumnsFromFirestore();const fetchedDevice = await firebaseService.getDeviceFromFireStore()
       setColumns(fetchedColumns);
       setDevices(fetchedDevice);
+      toggleLoader(false)
     };
     fetchColumns();
   }, []);
@@ -43,8 +48,11 @@ const Apps = () => {
     });
   };
 
-  const saveToFirebase = () => {
-    firebaseService.saveColumnsToFirestore(columns);
+  const saveToFirebase = async () => {
+    toggleLoader(true);
+    await firebaseService.saveColumnsToFirestore(columns);
+    toggleLoader(false);
+    toast.success("saved");
   };
 
   const handleTVSelect = (tvNumber, columnId) => {
@@ -76,9 +84,12 @@ const Apps = () => {
     setModalColumnIndex(null);
   };
 
-  const removeColumn = (columnId) => {
+  const removeColumn = async (columnId) => {
+    toggleLoader(true)
     const updatedColumns = columns.filter((column) => column.id !== columnId);
-    const data = firebaseService.deleteColumnFromFirestore(columnId);
+    const data = await firebaseService.deleteColumnFromFirestore(columnId);
+    toggleLoader(false)
+    toast.success("column removed");
     console.log("data : ", data);
     setColumns(updatedColumns);
   };
